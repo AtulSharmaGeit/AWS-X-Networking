@@ -46,7 +46,7 @@ Follow these steps to build your VPC:
    - IPv4 CIDR: `10.0.0.0/16`
    - Select **Create VPC** to finish setting up your VPC.
 
-![image alt](VPC setup)
+![image alt]([VPC setup](https://github.com/AtulSharmaGeit/Networking-Build_A_Virtual_Private_Cloud/blob/6d3e189d4acaa417352ea80a0d71fed40d646454/Images/VPC%20SetUp.png))
 
 2. **Create Subnets**
    - In the **VPC Dashboard**, under **Virtual Private Cloud**, choose **Subnets**.
