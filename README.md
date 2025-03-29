@@ -1,6 +1,6 @@
-# AWS Networks: Building a Virtual Private Cloud (VPC)
+# AWSXNetworking: Build a Virtual Private Cloud (VPC)
 
-Welcome to the **AWS Networks VPC Project**! This hands-on project is part of the [NextWork AWS Course](https://learn.nextwork.org/projects/aws-networks-vpc?track=high). You'll create a fully functional Amazon Virtual Private Cloud (VPC) with public and private subnets, routing, and internet connectivity.
+Welcome to the **AWS Networks VPC Project**! In  You'll create a fully functional Amazon Virtual Private Cloud (VPC) with public and private subnets, routing, and internet connectivity.
 
 ---
 
