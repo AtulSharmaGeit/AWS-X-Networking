@@ -52,6 +52,7 @@ Follow these steps to build your VPC:
 4. **Add an Internet Gateway**  
    - Name: `MyIGW`  
    - Attach to `MyNextWorkVPC`.
+  ![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking-Project/blob/571d887aa16a1edb456467ec605068c38509225d/Images/Internet%20Gateway.png)
 
 5. **Configure Routing**  
    - Create `PublicRouteTable`.  
