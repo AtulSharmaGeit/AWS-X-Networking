@@ -107,12 +107,79 @@ Attaching an internet gateway means resources in your VPC can now access the int
    - Select **Public 1**.
    - Choose **Save associations**.
   
-![image alt](43)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking-Project./blob/f9d41f57a448da0891ed1f0fe0b78afd1ace083d/Images/Screenshot%20(43).png)
    
 Ayyy nice! Your subnet is now public because it is connected to the Internet via the internet gateway!
 
+5. **Create a Security Group**  
+   - Let's add a security group so that users can access resources in your VPC.
+   - In the left navigation pane, choose **Security groups**. Note that this is further down the navigation pane than our other pages so far!
+   - **Woah! Why do we already have existing security groups?** - AWS automatically creates a default security group for each new VPC, which allows all traffic between resources within the same VPC. This default rule enables secure communication between resources without exposing them to external threats!
+   - Choose **Create security group**.
+   - Security group name:  `NextWork Security Group`
+   - Description:`A Security Group for the NextWork VPC.`
+   - VPC: **NextWork VPC**.
+   - Under the **Inbound rules** panel, choose **Add rule** - Inbound rules control the data that can enter the resources in your security group.
+   - Type: `HTTP`
+   - Source: `Anywhere-IPv4`
+   - At the bottom of the screen, choose **Create security group**.
 
- 
+**Wait, what about outbound rules? We only created an inbound rule.** By default, AWS security groups already allow all outbound traffic. So unless you specify otherwise, any resource associated with the security group can access and send data to any IP address - whether it's in your VPC, other VPCs (if you have the right permissions) and on the public internet!
+
+![image alt](44)
+
+6. **Create a Network ACL**  
+   - To level up your VPC's security, let's add a network ACL i.e. network access control list.
+   - In the left navigation pane, choose **Network ACLs**. Network ACLs are used to set broad traffic rules that apply to an entire subnet. For example, blocking incoming traffic from a particular range of IP addresses or denying all outbound traffic to certain ports.
+   - Oooo existing ACLs! - AWS sets up a **default network ACL** for every VPC in your account. This default is designed to allow all traffic to move freely until you decide to customize the rules to fit your needs.
+   - Choose the network ACL that's associated with your **Public 1** subnet, and check out the tabs for **Inbound rules** and **Outbound rules**. Just like security groups, network ACLs use inbound and outbound rules to decide which data packets are allowed to enter or leave subnets:
+     - **Rule 100 Inbound** allows all inbound traffic into the Public Subnet.
+     - **Rule 100 Outbound** allows all traffic out of the Public Subnet.
+     - The second line in each ruleset shows an asterisk (*) that acts as a catch-all rule in case traffic does not match any of the earlier rules.
+   - Let's recreate this set up ourselves in the console! Your default ACL has everything we need, but it's great practice to set up everything from scratch.
+     - Select **Create new network ACL**.
+     - Name: `NextWork Network ACL`
+     - VPC: **NextWork VPC**
+     - Select **Create network ACL**.
+   - Uncheck the default network ACL you've selected. The **default network ACLs** that AWS creates allow all inbound and outbound traffic. But for **custom network ACLs** that we create, all inbound and outbound traffic are denied until you add rules about the kind of traffic you'll allow.
+   - Select the checkbox next to **NextWork Network ACL**.
+   - Select the **Inbound rules** tab.
+   - Select **Edit inbound rules**.
+   - Select **Add new rule**.
+   - Rule number: `100` - In network ACLs, rule numbers decide the order that rules are checked—lower numbers go first. Starting at 100 gives you room to add new rules before it if you need to.
+   - Type: **All traffic**.
+   - Source: `0.0.0.0/0`
+   - Click **Save changes**.
+   - Select the **Outbound rules** tab.
+   - Select **Edit outbound rules**.
+   - Select **Add new rule**.
+   - Rule number: `100`
+   - Type: **All traffic**.
+   - Destination: `0.0.0.0/0`
+   - Select the **Subnet associations** tab, which should be right next to the Outbound rules tab. Aha, we're not finished, The subnet associations tab is empty! If your network ACL isn't associated with any subnets, all the rules you define won't affect your VPC's traffic.
+   - Under the **Subnet associations** tab, select **Edit subnet associations**.
+   - Select your **Public 1** subnet.
+   - Select **Save changes**.
+
+  Once you associate your Public 1 subnet with a new ACL, the default ACL that AWS created for you gets replaced.
+
+  ![image alt](45)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
 
 ---
 
