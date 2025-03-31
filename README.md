@@ -4,6 +4,7 @@
 - [Project Overview](#project-overview)
 - [Prerequisites](#prerequisites)
 - [Setup Instructions](#setup-instructions)
+  - [Create a VPC](#create-a-vpc)
 - [Architecture](#architecture)
 - [Key Learnings](#key-learnings)
 - [Troubleshooting](#troubleshooting)
@@ -163,7 +164,7 @@ Ayyy nice! Your subnet is now public because it is connected to the Internet v
 
   Once you associate your Public 1 subnet with a new ACL, the default ACL that AWS created for you gets replaced.
 
-  ![image alt](45)
+  ![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking-Project./blob/d23292b3dbcb83fce01ce9884b1fe1ab2b3c8360/Images/Screenshot%20(45).png)
 
 
 
