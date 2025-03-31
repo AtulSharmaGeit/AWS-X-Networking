@@ -100,12 +100,14 @@ Attaching an internet gateway means resources in your VPC can now access the int
    - Choose **Add route** near the bottom of the page.
    - Destination: `0.0.0.0/0` - 0.0.0.0/0 means all IPv4 addresses! When you set 0.0.0.0/0 as the destination in a route table, you are creating a default route that sends any traffic that doesn't match more specific routes on your route table.
    - Target: **Internet Gateway**.
-   - Select **NextWork IG**. ![image alt](43)
+   - Select **NextWork IG**. 
    - Choose **Save changes**.
    - Choose the **Subnet associations** tab.
    - Under the **Explicit subnet associations** tab, choose **Edit subnet associations**.
    - Select **Public 1**.
    - Choose **Save associations**.
+  
+![image alt](43)
    
 Ayyy nice! Your subnet is now public because it is connected to the Internet via the internet gateway!
 
