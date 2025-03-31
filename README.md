@@ -126,7 +126,7 @@ Ayyy nice! Your subnet is now public because it is connected to the Internet v
 
 **Wait, what about outbound rules? We only created an inbound rule.** By default, AWS security groups already allow all outbound traffic. So unless you specify otherwise, any resource associated with the security group can access and send data to any IP address - whether it's in your VPC, other VPCs (if you have the right permissions) and on the public internet!
 
-![image alt](44)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking-Project./blob/6f5d7ae90dddc3b5930bbd3e13b5169bb86bd864/Images/Screenshot%20(44).png)
 
 6. **Create a Network ACL**  
    - To level up your VPC's security, let's add a network ACL i.e. network access control list.
