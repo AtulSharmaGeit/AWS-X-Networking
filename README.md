@@ -1,52 +1,29 @@
-# AWS X Networking Project.
-
-## Table of Contents
-- [Project Overview](#project-overview)
-- [Prerequisites](#prerequisites)
-- [Setup Instructions](#setup-instructions)
-  - [Create a VPC](#create-a-vpc)
-- [Architecture](#architecture)
-- [Key Learnings](#key-learnings)
-- [Troubleshooting](#troubleshooting)
-- [Next Steps](#next-steps)
-
----
+# AWS X Networking
 
 ## Project Overview
 In this project, you’ll build an isolated network on AWS using a VPC. Key tasks include configuring subnets and attaching an Internet Gateway.
 
-**Objectives:**  
-- Building a Virtual Private Cloud.
-- VPC Traffic Flow and Security
-- Create public subnets.  
-- Enable internet access for public resources in our public subnet.
-
 ---
 
-## Prerequisites
-- **AWS Account**: Sign up for the [AWS Free Tier](https://aws.amazon.com/free/).  
-- **Knowledge**: Basic understanding of IP addressing and CIDR.  
-- **Tools**:  
-  - AWS Management Console (browser-based).  
-  - AWS CLI (optional).
-
+##  Table Of Content
+-  [Build a Virtual Private Cloud](Build-a-Virtual-Private-Cloud)
 ---
 
-## Setup Instructions
+## Build a Virtual Private Cloud
 Follow these steps to build your VPC:
 
-1. **Create a VPC**
-   - Log into **AWS Management Console**.
-   - In the **AWS Management Console** search field, type VPC.
-   - Select **VPC** from the drop down menu.
-   - In the left navigation panel, choose **Your VPCs**.
-   - Make sure you're on the **Region** that's closest to you. Use the dropdown on the top right hand corner to switch Regions.
-   - You'll notice that there is already a VPC in your account! When you created your AWS account, AWS automatically sets up a default VPC for you! This default VPC is why you could launch resources (e.g. EC2 instances) and connect services together from Day 1 of using AWS.
-   - Choose **Create VPC**.
-   - Choose **VPC Only**.
-   - **Name**: `NextWork VPC`
-   - **IPv4 CIDR**: `10.0.0.0/16`
-   - Select **Create VPC** to finish setting up your VPC.
+**Step - 1 : Create a VPC**
+- Log into **AWS Management Console**.
+- In the **AWS Management Console** search field, type VPC.
+- Select **VPC** from the drop down menu.
+- In the left navigation panel, choose **Your VPCs**.
+- Make sure you're on the **Region** that's closest to you. Use the dropdown on the top right hand corner to switch Regions.
+- You'll notice that there is already a VPC in your account! When you created your AWS account, AWS automatically sets up a default VPC for you! This default VPC is why you could launch resources (e.g. EC2 instances) and connect services together from Day 1 of using AWS.
+- Choose **Create VPC**.
+- Choose **VPC Only**.
+- **Name**: `NextWork VPC`
+- **IPv4 CIDR**: `10.0.0.0/16`
+- Select **Create VPC** to finish setting up your VPC.
 
 ![image alt](https://github.com/AtulSharmaGeit/Networking-Build_A_Virtual_Private_Cloud/blob/6d3e189d4acaa417352ea80a0d71fed40d646454/Images/VPC%20SetUp.png)
 
