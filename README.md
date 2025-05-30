@@ -1017,3 +1017,238 @@ Now visit each of the pages below!
 We're going to level up by setting up VPC Peering - we're going to play with TWO VPCs instead of one!
 
 **Step - 1 :  Set up our VPCs in Minutes**
+
+Now that we've learnt about the VPC wizard, let's use it to set up TWO VPCs in minutes.
+-   [Log in to our AWS Account](https://signin.aws.amazon.com/signin?redirect_uri=https%3A%2F%2Fconsole.aws.amazon.com%2Fconsole%2Fhome%3FhashArgs%3D%2523%26isauthcode%3Dtrue%26state%3DhashArgsFromTB_ap-southeast-2_fffdf5be4bb1a27e&client_id=arn%3Aaws%3Asignin%3A%3A%3Aconsole%2Fcanvas&forceMobileApp=0&code_challenge=m-aiqeB2UZeXTGXNyugMP8L64zd_AGUxJl4HLnA-X1o&code_challenge_method=SHA-256).
+-   Head to our **VPC** console - search for `VPC` at the search bar at top of our page.
+-   From the left hand navigation bar, select **Your VPCs**.
+-   Select **Create VPC**.
+-   We previously stuck to creating a VPC only, but this time let's select **VPC and more**.
+
+![image alt](Networking-73)
+
+**Create VPC 1**
+-   Under **Name tag auto-generation**, enter `NextWork-1`.
+-   The VPC's **IPv4 CIDR block** is already pre-filled to `10.0.0.0/16` - change that to `10.1.0.0/16`
+
+Since we're setting up 3 VPCs, it's easier to remember their CIDR blocks if their ranges match their names. For example, 10.**1**.0.0/16 for **VPC 1**, then 10.**2**.0.0/16 for **VPC 2**, and so on...
+
+-   For **IPv6 CIDR block**, we'll leave in the default option of **No IPv6 CIDR block**.
+-   For **Tenancy**, we'll keep the selection of **Default**.
+-   For **Number of Availability Zones (AZs)**, we'll use just **1** Availability Zone.
+-   Make sure the **Number of public subnets** chosen is `1`.
+-   For **Number of private subnets**, we'll keep thing simple today and go with `0` private subnets.
+-   We updated our subnets' CIDR blocks in previous projects, but we don't need defined subnets for this one. Let's skip the Customize subnets CIDR for this project.
+
+![image alt](Networking-74)
+
+-   Next, for the **NAT gateways ($)** option, make sure you've selected **None**. As the dollar sign suggests, NAT gateways cost money!
+
+NAT (Network Address Translation) gateways let instances in private subnets access the internet for updates and patches, while blocking inbound traffic.
+
+-   Next, for the **VPC endpoints** option, select **None**.
+
+VPC endpoints let us connect our VPC privately to AWS services without using the public internet. This means our data stays within the AWS network, which can improve security and reduce data transfer costs.
+
+-  We can leave the **DNS options** checked.
+-  Select **Create VPC**.
+
+![image alt](Networking-75)
+
+-   Select **View VPC**.
+-   Select the **Resource map** tab - nice, all of these resources have been set up for us in a flash!
+
+**Set up VPC 2**
+
+We're going to set up another VPC with slightly different settings - pay close attention!
+-   Select **Create VPC**.
+-   Select **VPC and more**.
+-   Under **Name tag auto-generation**, enter  `NextWork-2`
+-   The VPC's **IPv4 CIDR block** should be unique! Make sure the CIDR block is NOT `10.1.0.0/16` - it should be `10.2.0.0/16`.
+
+Each VPC must have a unique IPv4 CIDR block so the IP addresses of their resources don't overlap. Having overlapping IP addresses could cause routing conflicts and connectivity issues!
+
+-   For **IPv6 CIDR block**, we'll leave in the default option of **No IPv6 CIDR block**.
+-   For **Tenancy**, we'll keep the selection of **Default**.
+-   For **Number of Availability Zones (AZs)**, we'll use just `1` Availability Zone.
+-   Make sure the **Number of public subnets** chosen is `1`.
+-   For **Number of private subnets**, we'll go with `0`. Let's keep it simple with just a single subnet!
+-   For the **NAT gateways ($)** option, select **None**. 
+-   For the VPC endpoints option, select None.
+-   You can leave the **DNS options** checked.
+-   Select **Create VPC**.
+
+**Step - 2 : Create a Peering Connection**
+
+Now that we have two VPCs ready to go, let's bridge them together with a peering connection.
+
+-   Still in the VPC console, click on **Peering connections** on the left hand navigation panel.
+
+A peering connection lets VPCs and their resources route traffic between them using their private IP addresses. This means data can now be transferred between VPCs without going through the public internet. Without a peering connection, data transfers between VPCs would use resources' public address - meaning VPCs have to communicate over the public internet.
+
+![image alt](Networking-76)
+
+-   Click on **Create peering connection** in the right hand corner.
+-   Name our **Peering connection** name as `VPC 1 <> VPC 2`
+-   Select **NextWork-1-VPC** for our **VPC ID (Requester)**.
+
+In VPC peering, the Requester is the VPC that initiates a peering connection. As the requester, they will be sending the other VPC an invitation to connect!
+
+![image alt](Networking-77)
+
+-   Under **Select another VPC to peer with**, make sure **My Account** is selected.
+
+VPC peering can occur between VPCs in **different AWS accounts**! This flexibility lets businesses collaborate securely by sharing resources across accounts without exposing them to the public internet.
+
+-   For **Region**, select **This Region**.
+-   For **VPC ID (Accepter)**, select **NextWork-2-VPC**
+
+In VPC peering, the **Accepter** is the VPC that receives a peering connection request! The Accepter can either accept or decline the invitation. This means the peering connection isn't actually made until the other VPC also agrees to it!
+
+![image alt](Networking-78)
+
+-   Click on **Create peering connection**.
+-   Our newly created peering connection isn't finished yet! The green success bar says the peering connection has been requested.
+
+![image alt](Networking-79)
+
+-   On the next screen, select **Actions** and then select **Accept request**... Get ready to take a screenshot!
+
+We set up the VPC peering connection as VPC 1 (the Requestor), but don't forget that the Accepter needs to approve of it too! By clicking Accept request, we were accepting the connection as VPC 2.
+
+![image alt](Networking-80)
+
+-   Click on **Accept request** again on the pop up panel.
+-   Click on **Modify my route tables now** on the top right corner.
+
+![image alt](Networking-81)
+
+**Step - 3 : Update Route Tables**
+
+With a peering connection all set up, now it's time for traffic in our VPCs to learn how to use it.
+
+**Update VPC 1's route table**
+-   Select the checkbox next to VPC 1's route table i.e. called **NextWork-1-rtb-public**.
+-   Scroll down and click on the **Routes** tab.
+-   Click **Edit routes**.
+-   Let's add a new route!
+
+Even if our peering connection has been accepted, traffic in VPC 1 won't know how to get to resources in VPC 2 without a route in our route table! We need to set up a route that directs traffic bound for VPC 2 to the peering connection we've set up.
+
+-   Add a new route to **VPC 2** by entering the CIDR block `10.1.0.0/16` as our Destination.
+-   Under Target, select **Peering Connection**.
+-   Select **VPC 1 <> VPC 2**.
+
+![image alt](Networking-82)
+
+-   Click **Save changes**.
+-   Oops! We've hit an error.
+
+![image alt](Networking-83)
+
+The message says the destination we've put in has the same CIDR block as VPC 1's own CIDR block! Whoops that was a typo - VPC 2's CIDR block is actually 10.**2**.0.0/16. Route tables cannot differentiate between local and remote destinations if they share the same CIDR block. Imagine if we didn't set up VPC 2 with its own unique CIDR block in the previous step! We'd get into trouble here.
+
+-   Let's fix that typo now! Select **Back**.
+-   Update our new route's **Destination** to `10.2.0.0/16`.
+-   Click **Save changes** again.
+-   Confirm that the new route appears in VPC 1's **Routes** tab now!
+
+![image alt](Networking-84)
+
+**Update VPC 2's route table**
+-   The route table we're updating is **NextWork-2-rtb-public**.
+-   The **Destination** is the CIDR block `10.1.0.0/16`.
+
+![image alt](Networking-85)
+
+**Step - 4 : Launch EC2 Instances**
+
+Launch an EC2 instance in each VPC, so we can use them to test our VPC peering connection later.
+
+**Launch an instance in VPC 1**
+-   Head to the **EC2 console** - search for `EC2` in the search bar at the top of screen.
+-   Select **Instances** at the left hand navigation bar.
+-   Select **Launch instances**.
+-   Since our first EC2 instance will be launched in our first VPC, let's name it `Instance - NextWork VPC 1`
+-   For the **Amazon Machine Image**, select **Amazon Linux 2023 AMI**.
+-   For the **Instance type**, select **t2.micro**.
+-   For the **Key pair (login)** panel, select  **Proceed without a key pair (not recommended)**.
+-   At the **Network settings** panel, select **Edit** at the right hand corner.
+      -   Under **VPC**, select **NextWork-vpc-1**.
+      -   Under **Subnet**, select your VPC's public subnet.
+      -   Keep the **Auto-assign public IP** setting to **Disable**.
+      -   For the **Firewall (security groups)** setting, Amazon VPC already created a security group for our VPC - let's use that!
+      -   Choose **Select existing security group**.
+      -   Select the **default** security group for our VPC.
+-   Select **Launch instance**.
+
+**Launch an instance in VPC 2**
+-   The **Name** is `Instance - NextWork VPC 2`.
+-   The **VPC** is **NextWork-vpc-2**.
+
+![image alt](Networking-86)
+
+**Step - 5 : Connect to Instance 1**
+
+To test our VPC peering connection, we'll need to get one of our EC2 instances to try talk to the other.
+
+-   Still in our **EC2 console**, select the checkbox next to **Instance - NextWork VPC 1**.
+-   Select **Connect**.
+
+![image alt](Networking-87)
+
+Check out the error message: **"No public IPv4 address assigned. With no public IPv4 address, you can't use EC2 Instance Connect."**
+
+Keeping **Disable** for the **Auto-assign IP address** option in our EC2 instance's network settings caused this error! If we want to connect to our instance over EC2 Instance Connect, then our instance must have a public IP address and be in a public subnet. This is because using EC2 Instance Connect connects to our server **over the internet** by default.
+
+-   Verify this by heading back to the **Instances** page in our EC2 console, and checking the Public IPv4 address field... it's empty!
+
+![image alt](Networking-88)
+
+-   On our EC2 console's left hand navigation panel, select **Elastic IPs**.
+
+![image alt](Networking-90)
+
+**Elastic IPs** are static IPv4 addresses that get allocated to our AWS account, and is ours to delegate to an EC2 instance. Elastic IPs are also a great way to assign an instance a public IPv4 address after launching it!
+
+-   Select **Allocate Elastic IP** addresses.
+-   Leave all default options.
+
+![image alt](Networking-89)
+
+This setting is asking us to choose the source of the Elastic IP address. Since IPv4 addresses are unique on the internet, the IPv4 address we are allocated has to come from somewhere and can't overlap with other existing IPv4 addresses! The default setting is **Amazon's pool of IPv4 addresses**. Think of this as a public pool of all IPv4 addresses that Amazon has saved to allocate to AWS accounts, so we won't need to find one yourself.
+
+If we have our own pool of IP addresses, we can also set those up in our AWS account and allocate an IPv4 address from there instead (this is called Bring Your Own IP, or BYOIP).
+
+-   Select **Allocate**.
+-   Refresh our page, then select the new IP address we've set up.
+-   Select the **Actions** dropdown, then select **Associate Elastic IP address**.
+-   Under **Instance**, select **Instance - NextWork VPC 1**.
+
+![image alt](Networking-91)
+
+-   Click **Associate**.
+
+![image alt](Networking-92)
+
+This setting isn't quite relevant to us since our EC2 Instance only has one private IP address, but it becomes very important if an EC2 instance has multiple private IPs.
+
+-   Awesome! Our EC2 Instance should have a public IP address now.
+-   To check this, select **Instances** from the left hand navigation panel.
+-   Select the checkbox next to **Instance - NextWork VPC 1**.
+-   Do you see a **Public IPv4 address** for our EC2 instance now?
+
+![image alt](Networking-93)
+
+Looks like the IP address should be all resolved now... let's try connecting to our EC2 instance again!
+-   Select **Connect**.
+-   In the EC2 Instance Connect set up page, select **Connect** again.
+-   Oh no! We've failed to connect to our instance?!
+
+![image alt](Networking-94)
+
+-   Head back to our **VPC console**.
+-   Select **Subnets** from the left hand navigation panel.
+-   Select the checkbox next to **NextWork-1-subnet-public1**...
+-   Hmm let's take a look! Investigate the **Route table** and **Network ACL** tabs - what do we see?
+
