@@ -7,6 +7,14 @@ In this project, you’ll build an isolated network on AWS using a VPC. Key task
 
 ##  Table Of Content
 -  [Build a Virtual Private Cloud](#build-a-virtual-private-cloud)
+-  [VPC Traffic Flow and Security](#vpc-traffic-flow-and-security)
+-  [Creating a Private Subnet ](#creating-a-private-subnet)
+-  [Launching VPC Resources](#launching-vpc-resources)
+-  [Testing VPC Connectivity](#testing-vpc-connectivity)
+-  [VPC Peering](#vpc-peering)
+-  [VPC Monitoring with Flow Logs](#vpc-monitoring-with-flow-logs)
+-  [Access S3 from a VPC](#access-s3-from-a-vpc)
+-  [VPC Endpoints](#vpc-endpoints)
 ---
 
 ## Build a Virtual Private Cloud
@@ -487,3 +495,525 @@ By default, all resources are launched into the default VPC that AWS has set up 
 **Public IPv4 address** is the external IP address assigned to our EC2 instance. This address is globally unique, so no other server has the same public IPv4 address on the internet! Having a public IPv4 address means our instance can communicate with the internet and be accessible from outside our private AWS network.
 
 **Step - 2 : Launch a Private EC2 Instance**
+
+Let's follow similar steps to launch our **private** server!
+
+-   Select **Launch instances** again.
+-   Name: `NextWork Private Server`
+-   Amazon Machine Image (AMI): **Amazon Linux 2023 AMI**
+-   Instance type: **t2.micro**
+-   Key pair: **NextWork key pair**
+
+**Can we use the same key pair between multiple instances?** Yup, we can use the same key pair for more than one EC2 instance! This means we can use the same private key (i.e. the .pem file) to log into any of our instances using this key pair, making it easier to manage. From a security point of view, anyone with that key can access all the instances it's connected to - making it even more important to keep our private key safe.
+
+-   At the **Network settings** panel, select **Edit** at the right hand corner.
+-   Network: **NextWork VPC**
+-   Subnet: **NextWork Private Subnet**
+-   **Firewall (security groups)**: we said we'd use an alternative way to set up security groups for our private subnet's resources, and here we are!
+      -   Select **Create security group**.
+      -   For **Security group name**, let's use `NextWork Private Security Group`
+      -   For Description, we'll replace the default value with `Security group for NextWork Private Subnet`.
+      -   Notice the default Inbound Security Groups, the **Type** is set to **ssh**.
+ 
+SSH, or Secure Shell, is the protocol we use for this secure access to a remote machine. When we connect to the instance, SSH verifies we possess the correct private key corresponding to the public key on the server, ensuring only authorized users can access the instance.
+
+In terms of network communication, SSH is also as a type of network traffic. Once SSH has established a secure connection between us and the EC2 instance, all data transmitted (including our commands and the responses from the instance) is encrypted. This encryption makes SSH an ideal method for securely exchanging confidential data e.g. login credentials!
+
+![image alt](Networking-39)
+
+This popup says "Rules with source of `0.0.0.0/0` allow all IP addresses to access our instance. We recommend setting security group rules to allow access from known IP addresses only."
+
+AWS is concerned that the default security rule, i.e. with the source being `0.0.0.0/0`, allows any IP address to access our resource using SSH. We were okay with allowing HTTP traffic from `0.0.0.0/0` for our public subnet, but the private subnet is a different story!
+
+-   Change the **Source type** from **Anywhere** to **Custom**.
+-   In the **Source** drop down, scroll down and select **NextWork Public Security Group**.
+
+Choosing the **NextWork Public Security Group** as the source means only resources that are part of the NextWork Public Security Group can communicate with our instance. This restricts access to a much smaller group of trusted resources, rather than allowing potentially any IP address on the internet (0.0.0.0/0) to access our instance. A great move for securing a private subnet!
+
+![image alt](Networking-40)
+
+-   Select **Launch instance**.
+
+**Step - 3 : Delete Our Resources**
+
+Keeping track of our resources, and deleting them at the end, is absolutely a skill that will help us reduce waste in our account.
+
+-   In your **VPC console**, select the checkbox next to **NextWork VPC**.
+-   Select the **Actions** dropdown.
+-   Select **Delete VPC**.
+-   If stopped from deleting our VPC because **network interfaces** are still attached to our VPC - delete all the attached network interfaces first!
+
+**Network interfaces** get created automatically when we launch an EC2 instance. Think of them as a component that attaches to an EC2 instance on one end and our VPC on another - so that our EC2 instance is connected to our network and can send and receive data! Network interfaces are usually deleted automatically with our EC2 instance, but on some occassions it'd be faster to delete them manually.
+
+-   Type `delete` at the bottom of the pop up panel.
+-   Select **Delete**.
+
+![image alt](Networking-40')
+
+Now visit each of the pages below! **Refresh** our the page before checking if the resource we created is still in our account. They should be automatically deleted with our VPC, but it's always a good idea to check anyway:
+      1.   Subnets
+      2.   Route tables
+      3.   Internet gateways
+      4.   Network ACLs
+      5.   Security groups
+
+-   In our **EC2 console**, select the checkboxes next to both instances.
+-   Select the **Instance state** dropdown, and select **Terminate instance**.
+-   Select **Terminate**.
+
+---
+##   Testing VPC Connectivity
+
+**Step - 1 : Set up our VPC basics**
+
+Let's try a new way to create our entire VPC setup (it's a time saver)
+-   [Log in to our AWS Account](https://signin.aws.amazon.com/signin?redirect_uri=https%3A%2F%2Fconsole.aws.amazon.com%2Fconsole%2Fhome%3FhashArgs%3D%2523%26isauthcode%3Dtrue%26state%3DhashArgsFromTB_ap-southeast-2_fffdf5be4bb1a27e&client_id=arn%3Aaws%3Asignin%3A%3A%3Aconsole%2Fcanvas&forceMobileApp=0&code_challenge=m-aiqeB2UZeXTGXNyugMP8L64zd_AGUxJl4HLnA-X1o&code_challenge_method=SHA-256).
+-   Head back to your **VPC** console.
+-   From the left hand navigation bar, select **Your VPCs**.
+-   Select **Create VPC**.
+-   We previously stuck to creating a VPC only, but this time select **VPC and more**.
+-   Woah! A visual flow diagram pops up that shows us other VPC resources. This is called a **VPC resource map**!
+
+![image alt](Networking-41)
+
+With VPC resource map, we can quickly understand the architectural layout of a VPC, like the number of subnets, which subnets are associated with which route table, and which route tables have routes to an internet gateway.
+
+-   Now with this handy VPC resource map, we get to see that selecting the **VPC and more** option will also help us create VPC resources in the exact same page. No more jumping between pages in our VPC console!
+
+
+-   Scroll to view the entire VPC resource map, and take note of the resources listed.
+-   See if we can answer these questions:
+      1.   How many subnets are being created in our VPC?
+      2.   How many of those subnets are public, how many are private?
+      3.   How many route tables are being created in our VPC? Why?
+      4.   Is there an internet gateway being created?
+ 
+![image alt](Networking-42)
+
+Here are the answers!
+-   There are **4 subnets** being created.
+-   2 of those subnets are public, 2 are private.
+-   There are **3 route tables** being created - 1 for both public subnets to share, and 1 for each private subnet.
+-   There is an internet gateway being created - we can spot it under the fourth panel, **Network connections**!
+
+**Resource maps** help us understand how different components in our setup are connected and interact with each other. This makes it easier to design, manage, and troubleshoot our architecture because we can see everything at a glance, rather than sifting through lists and configurations. Our resource map looks straightforward since we have a nice and simple VPC architecture, but imagine how useful this tool would be for complex VPC setups with many subnets!
+
+-   Scroll back to the left hand side of the screen to see the VPC's set up.
+-   Under **Name tag auto-generation**, enter `Nextwork`
+
+**Name tag auto-generation** is a nifty feature that tags all our VPC resources with a name based on what we enter. If we type in `nextwork`, all our resources will have that in their name tags, making it super easy to track and manage everything linked to our VPC. We'll see this in action soon!
+
+-   The VPC's **IPv4 CIDR block** is already pre-filled to `10.0.0.0/16`.
+
+We can have multiple VPCs with the same IPv4 CIDR block in the same AWS region and account. AWS VPCs are isolated from each other by default, so there won't be any IP conflicts unless we explicitly connect them using VPC peering. Bottom line, it's possible for our new VPC to share the same CIDR block as an existing one, but this set up will mean our overlapping VPCs can't talk to each other directly. That's why it'd be best practice to have completely unique CIDR blocks for each VPC in our account!
+
+-   For **IPv6 CIDR block**, we'll leave in the default option of **No IPv6 CIDR block**.
+
+IPv6 is the latest version of IP addresses with a lot more IP addresses than IPv4. If we’re mostly working with IPv4, we can skip IPv6 for now to keep things simple. We usually don't need IPv6 unless our applications or users specifically need it.
+
+-   For **Tenancy**, we'll keep the selection of **Default**.
+
+Tenancy in AWS refers to the type of hardware our instances run on. We have two main options:
+      1.   **Default**: Our instances share hardware with other AWS customers. This is the standard option and is cost-effective because we’re sharing resources.
+      2.   **Dedicated**: Our instances run on hardware that's dedicated to us only. For example, imagine a healthcare company that needs to ensure the highest level of security for patient data. They might choose dedicated tenancy to make sure their servers are completely isolated from other customers, helping them meet compliance standards and keep sensitive information secure. Dedicated does come at a higher cost!
+
+-   For **Number of Availability Zones (AZs)**, we'll leave the default value of `2` for now and come back to this soon.
+-   Expand the **Customize AZs** arrow. Ooo we can even configure which two Availability Zones we'd like to set up for this VPC!
+
+![image alt](Networking-43)
+
+-   Next, notice that **Number of public subnets** only gives us two options - `0` or `2`.
+
+This is **AWS' best practice** advice at work! When we pick 2 Availability Zones, the wizard makes sure we have a public subnet in each one. This way, our public resources stay up even if one of the two Availaiblity Zones goes down. This setup is called **redundancy** (having backups in different places) and **high availability** (making sure our resources are always accessible). Just one public subnet wouldn’t offer this kind of reliability, so AWS doesn't let us create just one!
+
+**VPC wizard** limits us to two public subnets to keep things straightforward. If we need more, we can always add them manually later - we can have up to 200 subnets total in a VPC! After all, this VPC set up page’s aim is to get us up and running quickly without overwhelming us with options.
+
+-   Similar to this, **Number of private subnets** only gives you three options - `0`, `2` or `4`.
+
+**How is it that we can create up to 4 private subnets, but only 2 public subnets?** AWS's best practice advice is at work again! Having more private subnets can help with organizing our resources and isolating them for security purposes, whereas public subnets are limited to ensure manageable exposure to the internet.
+
+-   Try selecting the option for 4 private subnets, and watch our resource map update itself!
+
+![image alt](Networking-44)
+
+**Why do we have 5 route tables?** In a VPC, **public subnets** usually share a single route table because they all need to route traffic to the internet through the same internet gateway. This simplifies management since all public subnets follow the same rules for internet access. For **private subnets**, each one often has its own route table to control and customize traffic routing more precisely. This allows for different routing rules and security controls for each private subnet. 
+
+![image alt](Networking-45)
+
+-   PAUSE - what will happen if we change the number of Availability Zones from `2` to `1`?
+-   Make our prediction on how this resource map will look differently...
+-   Scroll back to the Availability Zone field, and change the selection from `2` to `1`!
+
+![image alt](Networking-46)
+
+Changing the number of availability zones updates the number of subnets and route tables to keep things balanced and reliable. Fewer zones mean fewer resources are needed to maintain that balance and reliability.
+
+-   Change the **Number of private subnets** from `2` to `1`. Now we have just two subnets total - one public and one private subnet!
+-   Update our public and private subnets' CIDR blocks:
+      -   Update our public subnet CIDR block to `10.0.0.0/24`
+      -   Update our private subnet CIDR block to `10.0.1.0/24`
+ 
+**Why do the subnets' default CIDR blocks finish in /20 by default?** The default /20 subnet provides 4,096 IP addresses, which is a good middle ground for most use cases. Typically the norm is to use **/8 /16 /24 /32**. The /20 size offers a balance between too few and too many IP addresses, making it useful for most network setups without overwhelming us with an excessive number of IPs.
+
+![image alt](Networking-47)
+
+-   Next, for the **NAT gateways ($)** option, make sure we've selected **None**. As the dollar sign suggests, NAT gateways cost money!
+
+![image alt](Networking-48)
+
+**NAT gateways** let instances in private subnets access the internet for updates and patches, while blocking inbound traffic. For example, our private server in our private subnet might need to download security updates. By using a NAT gateway, the server can access these updates securely while remaining protected from external threats!
+
+On the other hand, **internet gateways** let instances in public subnets communicate with the internet both ways i.e. both inbound and outbound traffic.
+
+**Why would we use a NAT gateway? Couldn't we just set up an internet gateway with no public inbound traffic but allow outbound traffic?** Instances in public subnets using an internet gateway still need public IP addresses to communicate with the internet. Assigning public IP addresses to our instances makes them accessible from the internet, increasing the attack surface. Even with strict security group rules, there's always a risk of misconfiguration or vulnerabilities being exploited.
+
+Private subnets are meant to keep our instances isolated from the public internet, so using public IP addresses for instances in private subnets would not be ideal. That's where NAT gateways come in! Instances in private subnets using a NAT gateway do not need public IP addresses. The NAT gateway handles a translation to a public IP, keeping our instances' private IPs hidden.
+
+-   Next, for the **VPC endpoints** option, select **None**.
+
+![image alt](Networking-49)
+
+Normally, to access some AWS services like S3 from our VPC, our traffic would go out to the public internet. But, VPC endpoints let us connect our VPC privately to AWS services without using the public internet. This means our data stays within the AWS network, which can improve security and reduce data transfer costs.
+
+There are many types of VPC endpoints, and the **S3 Gateway endpoint** is the most common and useful one - many applications need to access S3 for storing or retrieving data after all! The endpoints for other AWS services can be added later, but this setup tool simplifies the initial setup by focusing on S3.
+
+-   We can leave the **DNS options** checked.
+
+When we enable **DNS hostnames**, our EC2 instances can have human-readable names, like denzelnextwork.compute-1.amazonaws.com, instead of just numeric IP addresses. This makes it simpler to identify and connect to our instances.
+
+When we enable **DNS resolution**, AWS takes care of translating these hostnames to their corresponding IP addresses so that network requests can find the correct instance. This is particularly useful in environments where IP addresses might change - hostnames can stay consistent, so references to our resource would still point to the right thing.
+
+-   Select **Create VPC**.
+-   Super satisfying to see this loading bar of our VPC and its resources getting created!
+
+![image alt](Networking-50)
+
+-   Select **View VPC**.
+-   Select the **Resource map** tab.
+
+![image alt](Networking-51)
+
+-   Note how name tag auto-generation, which we enabled in the set up page, is at work now - all of our VPC's resources have `nextwork` at the start of the name!
+-   Within our resource map, click on our **public subnet**.
+-   Oooo, now we get to see how our public subnet is connected to a public route table and our internet gateway.
+
+![image alt](Networking-52)
+
+**Validate and rename your resources**
+
+Let's tidy up our resources' names! Take 3 minutes to rename our:
+-  **VPC**
+      -   Select **Your VPCs** from the left hand navigation panel.
+      -   Hover over **NextWork-vpc** and select the pencil icon.
+      -   Rename our VPC to `NextWork VPC`
+      -   Select **Save**.
+
+-   **Subnets**
+      -   Select **Subnets** from the left hand navigation panel.
+      -   Rename our public subnet i.e. **NextWork-subnet-public1-xxx** to `NextWork Public Subnet`.
+      -   Rename our private subnet i.e. **NextWork-subnet-private1-xxx** to `NextWork Private Subnet`.
+
+-   **Route tables**
+      -   Select **Route tables** from the left hand navigation panel.
+      -   Rename our public route table i.e. **NextWork-rtb-public** to `NextWork Public Route Table`.
+      -   Rename our private route table i.e. **NextWork-rtb-private1-xxx** to `NextWork Private Route Table`.
+ 
+-   **Internet gateway**
+      -   Select **Internet gateways** from the left hand navigation panel.
+      -   Rename our internet gateway i.e. **NextWork-igw** to `NextWork IG`.
+ 
+-   **Network ACLs**
+      -   Select **Network ACLs** from the left hand navigation panel.
+      -   Select **Create network ACL** on the top right.
+      -   For the name, enter `NextWork Private NACL`.
+      -   Select **NextWork VPC**.
+      -   Select **Create network ACL**.
+      -   Select the checkbox next to **NextWork Private NACL**.
+      -   Switch tabs to **Subnet associations**.
+      -   Select **Edit subnet associations**.
+      -   Select our **private** subnet.
+      -   Select **Save changes**.
+      -   To tidy up our network ACLs' naming conventions, let's also rename our VPC's default NACL to `NextWork Public NACL`
+🧠 Hint: the other network ACL with just 1 subnet associated is our VPC's default network ACLs!
+      -   Observe the **Inbound rules** and **Outbound rules** tabs for our private network ACL.
+ 
+**Why are they both denying all traffic?**  Remember that custom network ACLs start with denying all inbound and outbound traffic! We'll leave these settings for now.
+
+-   **Security groups**
+      -   Select **Security groups** from the left hand navigation panel.
+      -   Yay default security groups have already been set up for us! Their names are **default** and... **default**.
+      -   Select either one of the two and observe its inbound rules.
+      -   Hmmm these **default** security groups don't quite have the same inbound rules as the ones we used to set up ourselves.
+      -   Let's create new security groups instead of using these default ones.
+      -   Choose **Create security group**.
+      -   Security group name:  `NextWork Public Security Group`.
+      -   Description: `A Security Group for the NextWork VPC Public Server`.
+      -   VPC: **NextWork VPC**.
+      -   Under the **Inbound** rules panel, choose **Add rule**.
+      -   Type: `HTTP`
+      -   Source: `Anywhere-IPv4`
+      -   At the bottom of the screen, choose **Create security group**.
+ 
+**Launch a new EC2 instance in NextWork Public Subnet**
+-   Head to the **EC2 console** - search for `EC2` in the search bar at the top of screen.
+-   Select **Instances** at the left hand navigation bar.
+-   Select **Launch instances**.
+-   Since our first EC2 instance will be launched in the public subnet, let's name it `NextWork Public Server`
+-   For the **Amazon Machine Image**, select **Amazon Linux 2023 AMI**.
+-   For the **Instance type**, select **t2.micro**.
+-   For the **Key pair (login)** panel, select **NextWork key pair**.
+      -   NOTE: If we've never created **NextWork key pair**, or we've deleted it, all we have to do is:
+            -   Select **Create new key pair**.
+            -   For the **Key pair name**, use `NextWork key pair`.
+            -   Keep the **Key pair type** as **RSA**.
+            -   Keep the **Private key file format** as **.pem**.
+            -   Select **Create key pair**.
+       
+-   At the **Network settings** panel, select **Edit** at the right hand corner.
+-   Select **NextWork VPC** from the drop-down in the VPC list.
+-   Select our public subnet.
+-   Update the **Auto-assign public IP** setting to **Enable**.
+-   For the **Firewall (security groups)** setting, we've already created a security group - let's use that!
+-   Choose **Select existing security group**.
+-   Select **NextWork Public Security Group**.
+-   Select **Launch instance**.
+-   Click into our instance once it's successfully launched.
+-   Select the checkbox next to our instance, and a **Details** panel pops up!
+-   Switch the tab to **Networking**.
+-   Notice how NextWork Public Server has a Public IPv4 address, a subnet, an Availability zone, and a VPC ID.
+
+![image alt](Networking-53)
+
+**Launch a new EC2 instance in NextWork Private Subnet**
+-   Select **Launch instances** again.
+-   Name: `NextWork Private Server`.
+-   Amazon Machine Image (AMI): **Amazon Linux 2023 AMI**
+-   Instance type: **t2.micro**
+-   Key pair: **NextWork key pair**
+-   At the **Network settings** panel, select **Edit**.
+-   Network: **NextWork VPC**
+-   Subnet: **NextWork Private Subnet**
+-   **Firewall (security groups)**: Select **Create security group**.
+      -   For **Security group name**, let's use `NextWork Private Security Group`.
+      -   For **Description**, we'll replace the default value with `Security group for NextWork Private Server`.
+      -   Notice that under the **Inbound Security Group Rules** section, there is a rule with **Type** set to **ssh**.
+-   Change the **Source type** from **Anywhere** to **Custom**.
+-   In the **Source** drop down, scroll down and select **NextWork Public Security Group**.
+
+Choosing the **NextWork Public Security Group** as the source means only resources that are part of the NextWork Public Security Group can communicate with your instance.
+
+![image alt](Networking-54)
+
+-   Select **Launch instance**.
+
+**Step - 2 : Connect to NextWork Public Server**
+
+Now that we've set up a public server and a private server, let's test whether we can get our EC2 instances to talk to each other despite being in different subnets.
+-   Still in your **EC2** console, select **Instances** from the left hand navigation panel.
+-   Select the checkbox next to **NextWork Public Server**.
+-   Select **Connect**.
+
+Connectivity testing often involves fine-tuning our security group settings and network ACLs to make sure the right traffic can flow in and out of our instances as we'd expect!
+
+-   Keep all of the default settings.
+
+![image alt](Networking-55)
+
+**EC2 Instance Connect** is an alternative way to use SSH - Instance Connect lets us securely connect to our EC2 instances directly using the AWS Management Console. We're still using SSH, but with all the key management handling it for us. This takes away a lot of the complexity of setting up SSH.
+
+-   Select Connect.
+-   Oh no! We've failed to connect to our instance?
+
+![image alt](Networking-56)
+
+Let's investigate what happened by reviewing our security settings.
+-   Head back to our **VPC console**.
+-   Select **Subnets** from the left hand navigation panel.
+-   Select the checkbox next to **NextWork Public Subnet**.
+-   Hmm let's take a look! Investigate the **Route table** and **Network ACL** tabs - what do we see?
+
+![image alt](Networking-57)
+
+![image alt](Networking-58)
+
+Everything looks good! Our Network ACL allows all traffic in and out, and our route table is correctly setting up a route to the Internet Gateway.
+
+-   Hmmm that leaves one more thing to investigate...
+-   Head into the **Security groups** page from the left hand navigation bar.
+-   Select the checkbox next to **NextWork Public Security Group**.
+-   Select the **Inbound rules** tab.
+-   Aha! Mystery solved.
+
+![image alt](Networking-59)
+
+Security group associated with NextWork Public Server lets in all inbound HTTP traffic, but this is not how we're trying to access our Public Server! We're trying to access NextWork Public Server using SSH through EC2 Instance Connect, which is a different traffic type.
+
+-   In the **Inbound rules** tab, select **Edit inbound rules**.
+-   Select **Add rule**.
+-   For our new rule, configure the **Type** as **SSH**.
+-   Then, under **Source type**, select **Anywhere-IPv4**.
+
+In this step, we are updating NextWork Public Server's security group so it can let in SSH traffic. Choosing **Anywhere-IPv4** as the source lets in SSH connections from **any** IPv4 address. It's generally not best practice to set SSH access to "Anywhere-IPv4" due to security risks - this setup exposes our server to potential unauthorized access from any location.
+
+Setting the source to Anywhere-IPv4 makes sure that EC2 Instance Connect will be successful, no matter which IP address it's using. If this was a long-term project, we'd search for the specific CIDR block of IP addresses that EC2 Instance Connect uses and restrict inbound SSH traffic to that range.
+
+![image alt](Networking-60)
+
+-   Select **Save rules**.
+-   With that modified, refresh our EC2 console's **Instances** page.
+-   Select our **Public Server** and select **Connect** again.
+-   Phew! Success.
+
+![image alt](Networking-61)
+
+**Step - 3 : Test connectivity between our EC2 instances**
+
+Let's see if we can connect with our Private Server from here.
+
+**What does it mean to connect to our Private Server from our Public Server?** When our servers "talk" or connect, it usually means the public server is sending or requesting data from the private server. This could be for various reasons, such as fetching private information  or updating databases.
+
+-   Leave open the **EC2 Instance Connect** tab, but head back to your **EC2 console** in a new tab.
+-   Select **NextWork Private Server**.
+-   Copy our private server's **Private IPv4 address**.
+
+![image alt](Networking-62)
+
+-   Switch back to the **EC2 Instance Connect** tab.
+-   Run `ping [the Private IPv4 address you just copied]` in terminal.
+      -   Our final result should look similar to something like `ping 10.0.1.227`.
+      -   Don't know where to enter this prompt? Look for the `$` sign at the bottom line of the black window, and type in our command after the $ sign.
+ 
+**Ping** is a common computer network tool used to check whether our computer can communicate with another computer or device on a network. When we "ping" a specific IP address address (i.e. another server's address), our server (in this case, NextWork Public Server) sends a small packet of data to that address (NextWork Private Server), asking for a response. Ping will tells us whether we get a response back and how long it took to get a response.
+
+If we receive a response quickly, it means the connection between our computer and the other computer is good. If it takes a long time or we get no response, there might be a problem with the connection!
+
+-   We should see a response similar to this:
+
+![image alt](Networking-63)
+
+This single line indicates that our Public Server has sent out a ping message... and that's about it. Usually, when we ping another computer successfully, we should see several replies back instantly. Each reply tells us how long it took for the message to go to the Private Server and come back.
+
+If we don't get any replies (that's our situation right now), or if the replies stop suddenly, it's usually a sign that there's a problem with the connection.
+
+**Why is there a problem with the connection between our servers?** One common reason for these issues is that the target machine (i.e. NextWork Private Server) or its network might be blocking the type of messages used in ping, which are known as **ICMP (Internet Control Message Protocol) traffic**. Blocking ICMP traffic is often done to prevent network attacks, like attackers can overwhelming a server with ping messages so it can't respond to real users wanting to use our application. Fair enough that ICMP traffic is blocked by default!
+
+-   To resolve this connectivity error, let's investigate whether NextWork Private Server is allowing in ICMP traffic.
+-   Leave open the **EC2 Instance Connect** tab, but head back to our **VPC console** in a new tab.
+-   In the VPC console, select the **Subnets** page.
+-   Select **NextWork Private Subnet**.
+-   Let's investigate the **Route tables** and **Network ACL** tabs for our private subnet.
+-   Aha! Mystery solved.
+
+![image alt](Networking-64)
+
+**How are the Route tables and Network ACLs the cause of our connectivity issue?** Our route table is set up perfectly (zero issues there!), but the Network ACL tab shows us that all traffic inbound and outbound are denied. This means even if our route table correctly directs the ping to NextWork Private Server, the network ACL is checking the ping traffic at the entrance of our private subnet. If it finds that ICMP traffic is not allowed, it stops the ping there. This blockage could be the reason why we observed only one line in the ping response - the single line records NextWork Public Server's first attempt to communicate (i.e. a ping message is sent), but there are no replies back from NextWork Private Server.
+
+-   Let's resolve that by clicking on the link to our **NextWork Private NACL**.
+-   Select the checkbox next to **NextWork Private NACL**.
+-   Select the **Inbound rules** tab.
+-   Select **Edit inbound rules**.
+-   Let's add a new rule to let NextWork Public Server ping NextWork Private Server.
+-   Select **Add new rule**.
+-   Assign `100` as the rule number.
+-   Change the **Type** to **All ICMP - IPv4**.
+
+When we set a rule for **All ICMP - IPv4**, we're allowing all types of ICMP messages for IPv4 addresses. This covers a wide range of operational messages that are essential for diagnosing network connectivity issues, ping requests and responses are just one type of ICMP messages. We might notice that ICMP is not limited to IPv4; there is also ICMP for IPv6 , which functions similarly but is tailored specifically for IPv6 networks.
+
+-   Set the **Source** to traffic coming from our public subnet - `10.0.0.0/24`.
+-   Select **Save changes**.
+
+![image alt](Networking-65)
+
+-   Let's apply the same to Outbound rules.
+      -   Rule number: `100`.
+      -   Type: **All ICMP - IPv4**.
+      -   Source: `10.0.0.0/24`.
+-   Before we finish, let's check the security groups! Select **Security groups** from the left hand navigation panel.
+-   Select **NextWork Private Security Group**.
+-   Check your **Inbound rules** tab - does this security group allow ICMP traffic? (Nope!)
+
+![image alt](Networking-66)
+
+Now that our private network ACLs allow ICMP traffic, ICMP messages can enter our public subnet. However, these messages still need to be let in by our **NextWork Private Security Group** to reach our private server. So if our security group isn't allowing in ICMP traffic too, the ping message wouldn't reach our private server!
+
+-   Select **Edit inbound rules**.
+-   Select **Add rule**.
+-   For **Type**, select **All ICMP - IPv4**.
+-   For **Source**, select **NextWork Public Security Group**.
+
+![image alt](Networking-67)
+
+**We didn't pick NextWork Public Security Group as the source for the network ACL... why is the source different here?** Notice how we can select traffic from the **NextWork Public Security Group** as a source here, which is much more granular and exclusive than the private NACL, which allows in all traffic from our public subnet. NACLs typically have a broader scope since its settings would affect all resources in our subnet.
+
+-   Select **Save rules**.
+-   Revisit the **EC2 Instance Connect** tab that's connected to NextWork Public Server.
+-   Woah! Lots of new lines coming through in the terminal.
+
+![image alt](Networking-68)
+
+The multiple new lines appearing in our terminal are a sign of successful communication between the two EC2 instances! Each line represents a reply from the ping command we sent. This means that the ICMP (Internet Control Message Protocol) traffic is now successfully reaching the private server, thanks to the adjustments we made in the network ACLs and Security Groups.
+
+**Step - 4 : Test VPC connectivity with the internet**
+
+Since our NextWork Public Route Table has a route from the NextWork Public Subnet to an internet gateway, we can validate that resources in NextWork Public Subnet can access the internet!
+
+-   Quit the ping command by pressing `Control + C` on our keyboard.
+-   Let's enter a new command!
+-   Type in `curl example.com` in the prompt, i.e. right after the $ sign at the bottom line of the black window.
+-   We should see a response similar to this!
+
+![image alt](Networking-69)
+
+Just like ping, **curl** is a tool to test connectivity in a network. Where ping checks if one computer can contact another (and how long messages take to travel back and forwth), curl is used to transfer data to or from a server. That means on top of checking connectivity, we can use curl to grab data from, or upload data into other servers on the internet!
+
+When we use the `curl` command followed by a website address, e.g. `example.com`, the command sends an HTTP request to the server that hosts the website. This request tells the server that we want to retrieve the HTML content of the website. The website's server then processes this request and sends back the data as a response. The curl command outputs this data to our terminal, so what we're seeing is the raw HTML from the server!
+
+-   This output confirms that our **Public Sever** instance can talk with the internet.
+-   This wouldn't be possible if NextWork Public Subnet, our internet gateway and our security settings weren't set up properly... nice work!
+-   Now let's run `curl nextwork.org`
+
+![image alt](Networking-70)
+
+The output **Found** typically means that the website at the URL we entererd has moved to a new URL! This is true - `nextwork.org` currently redirects requests to the first project on our web app, which has a different URL!
+
+-   Now let's try running curl with the URL that our terminal returned. Run `curl https://learn.nextwork.org/projects/aws-host-a-website-on-s3`
+
+![image alt](Networking-71)
+
+Just like the previous example using `curl example.com`, curl has fetched the complete HTML content of NextWork's web app (specifically, the first project on the web app), which is why we now see a large amount of HTML data. We've just used our Public Server to fetch all the HTML code necessary to render a webpage!
+
+**Step - 5 : Delete Our Resources**
+
+**Public and Private Servers:**
+-   In our **EC2 console**, select the checkboxes next to both instances.
+-   Select the **Instance state** dropdown, and select **Terminate instance**.
+-   Select **Terminate**.
+
+**VPC:**
+-   In our **VPC console**, select the checkbox next to **NextWork VPC**.
+-   Select the **Actions** dropdown.
+-   Select **Delete VPC**.
+-   If stopped from deleting our VPC because network interfaces are still attached to our VPC - delete all the attached network interfaces first!
+
+**Network interfaces** get created automatically when we launch an EC2 instance. Think of them as a component that attaches to an EC2 instance on one end and our VPC on another - so that our EC2 instance is connected to our network and can send and receive data! Network interfaces are usually deleted automatically with our EC2 instance, but on some occassions it'd be faster to delete them manually.
+
+-   Type `delete` at the bottom of the pop up panel.
+-   Select **Delete**.
+
+![image alt](Networking-72)
+
+Now visit each of the pages below!
+
+**Refresh** our page before checking if the resource we created is still in our account. They should be automatically deleted with our VPC, but it's always a good idea to check anyway:
+1.   Subnets
+2.   Route tables
+3.   Internet gateways
+4.   Network ACLs
+5.   Security groups
+
+---
+## VPC Peering
+
+We're going to level up by setting up VPC Peering - we're going to play with TWO VPCs instead of one!
+
+**Step - 1 :  Set up our VPCs in Minutes**
