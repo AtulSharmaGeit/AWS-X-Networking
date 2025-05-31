@@ -1252,3 +1252,433 @@ Looks like the IP address should be all resolved now... let's try connecting to 
 -   Select the checkbox next to **NextWork-1-subnet-public1**...
 -   Hmm let's take a look! Investigate the **Route table** and **Network ACL** tabs - what do we see?
 
+![image alt](Networking-95)
+
+![image alt](Networking-96)
+
+Everything looks good! Our Network ACL allows all traffic in and out, and our route table is correctly setting up a route to the Internet Gateway. That leaves one more thing to investigate...
+
+-   Copy the **VPC ID** of **NextWork-1-vpc**.
+
+![image alt](Networking-97)
+
+-   Head into the **Security groups** page from the left hand navigation panel.
+-   Woah it's a bunch of nameless security groups!
+-   To find the VPC 1's default security group, let's use the handy search bar.
+-   Click into the search bar, and paste the ID we copied into the search bar. Make sure there aren't any empty spaces before our text.
+-   Select the filter!
+
+![image alt](Networking-98)
+
+-   Nice, that narrowed it nicely for us. Select the checkbox next to VPC 1's **default** security group.
+-   Select the **Inbound rules** tab.
+
+![image alt](Networking-99)
+
+-   Aha! Mystery solved.
+
+The answer lies in the **Source** of our security group's inbound rules. We're trying to access **Instance - NextWork VPC 1** using SSH through EC2 Instance Connect, which is trying to connect to our instance over the internet. Our default security group only allows inbound traffic from within the VPC, so traffic from the internet is being cut off! The default security group for a new VPC does not allow incoming traffic from outside of the VPC. We have to allow inbound SSH traffic on port 22 ourself!
+
+-   In the **Inbound rules** tab, select **Edit inbound rules**.
+-   Select **Add rule**.
+-   For our new rule, configure the **Type** as **SSH**.
+-   Then, under **Source type**, select **Anywhere-IPv4**.
+-   Select **Save rules**.
+
+![image alt](Networking-100)
+
+-   With that modified, refresh our EC2 console's **Instances** page.
+-   Select our **Instance-NextWork VPC 1** and select **Connect** again.
+-   Select **Connect** in the EC2 Instance Connect setup page.
+-   Phew! Success.
+
+![image alt](Networking-101)
+
+**Step - 6 : Test VPC Peering**
+
+We've figured out how to connect with VPC 1's Instance! Let's see if we can connect with VPC 2's instance from here.
+
+-   Leave open the **EC2 Instance Connect** tab, but head back to your **EC2 console** in a new tab.
+-   Select **Instance - NextWork VPC 2**.
+-   Copy Instance - NextWork VPC 2's **Private IPv4 address**.
+
+![image alt](Networking-102)
+
+-   Switch back to the **EC2 Instance Connect** tab.
+-   Run `ping [the Private IPv4 address we just copied]` in the terminal.
+      -   Our final result should look similar to something like `ping 10.0.1.227`
+      -   Don't know where to enter this prompt? Look for the `$` sign at the bottom line of the black window, and type in our command after the `$` sign.
+ 
+**Ping** is a common computer network tool used to check whether our computer can communicate with another computer or device on a network. When we "ping" a specific IP address, our server (in this case, Instance - NextWork VPC 1) sends a small packet of data to the target server (Instance - NextWork VPC 2), asking for a response. Ping will tell us whether we get a response back and how long it took to get a response. If we receive a response quickly, it means the connection between our computer and the other computer is good. If it takes a long time or we get no response, there might be a problem with the connection!
+
+-   We should see a response similar to this:
+
+![image alt](Networking-103)
+
+This single line indicates that our Instance - NextWork VPC 1 has sent out a ping message... and that's about it. If we don't get any replies (that's our situation right now), or if the replies stop suddenly, it's usually a sign that there's a problem with the connection.
+
+One common reason for these issues is that the target server (Instance - NextWork VPC 2) or its network might be blocking the type of messages used in ping, which are known as **ICMP (Internet Control Message Protocol) traffic**. Blocking ICMP traffic is often done to prevent network attacks, like attackers can overwhelming a server with ping messages so it can't respond to real users wanting to use our application. Fair enough that ICMP traffic is blocked by default!
+
+-   To resolve this connectivity error, let's investigate whether **Instance - NextWork VPC 2** is allowing inbound ICMP traffic.
+-   Leave open the **EC2 Instance Connect** tab, but head back to our **VPC console** in a new tab.
+-   In the VPC console, select the **Subnets** page.
+-   Select VPC 2's subnet i.e. **NextWork-2-subnet-public1-...**
+-   Let's investigate the **Route tables** and **Network ACL** tabs for our public subnet.
+-   The network ACL allows all types of inbound traffic from anywhere! So this looks perfectly fine.
+-   Before we finish, let's check the security groups!
+-   Copy the **VPC ID** of VPC 2.
+
+![image alt](Networking-104)
+
+-   Select **Security groups** from the left hand navigation panel.
+-   Paste the **VPC ID** in the search bar, and select the suggested filter.
+-   Check our security group's **Inbound rules** tab - does this security group allow ICMP traffic from sources outside of VPC 2? (Nope!)
+-   Aha! Mystery solved.
+
+**Let's fix this by letting inbound ICMP traffic from VPC 1.**
+-   Select **Edit inbound rules**.
+-   Select **Add new rule**.
+-   Change the **Type** to **All ICMP - IPv4**.
+
+When we set a rule for **All ICMP - IPv4**, we're allowing all types of ICMP messages for IPv4 addresses. This covers a wide range of operational messages that are essential for diagnosing network connectivity issues, ping requests and responses are just one type of ICMP messages.
+
+-   Set the **Source** to traffic coming from **VPC 1** - `10.1.0.0/16`
+-   Select **Save rules**.
+
+![image alt](Networking-105)
+
+-   Revisit the **EC2 Instance Connect** tab that's connected to **Instance - NextWork VPC 1**.
+-   Woah! Lots of new lines coming through in the terminal.
+
+![image alt](Networking-106)
+
+The multiple new lines appearing in your terminal are a sign of successful communication between the two EC2 instances. 
+
+**Congratulations!** We've set up a peering architecture that connects **VPC 1** to **VPC 2** AND validated it with ping.
+
+**Step - 7 : Delete Our Resources**
+
+Keeping track of our resources, and deleting them at the end, is absolutely a skill that will help us reduce waste in our account.
+
+**Delete our EC2 Instances**
+-   Head back to the **Instances** page of our EC2 console.
+-   Select the checkboxes next to **Instance - NextWork VPC 1** and **Instance - NextWork VPC 2**.
+-   Select **Instance state**, then select **Terminate Instance**.
+-   Select **Terminate**.
+
+**Delete our Elastic IP address**
+-   Select **Elastic IPs** from the left hand navigation panel.
+-   Select the IP address we've created.
+-   Select **Actions**, then **Release Elastic IP addresses**.
+
+When we release an Elastic IP address, that address returns to Amazon's pool of IPv4 address and will eventually get reallocated to another AWS user!
+
+-   Select **Release**.
+
+**Delete VPC Peering Connections**
+-   Head back to our **VPC** console.
+-   Select **Peering connections** from your left hand navigation panel.
+-   Select the `VPC 1 <> VPC 2` peering connection.
+-   Select **Actions**, then **Delete peering connection**.
+-   Select the checkbox to **Delete related route table entries**.
+-   Type `delete` in the text box and click **Delete**.
+
+**Delete our VPCs**
+-   Select **Your VPCs** from your left hand navigation panel.
+-   Select **NextWork-1-vpc**, then **Actions**, and **Delete VPC**.
+-   Type `delete` in the text box and click **Delete**.
+-   Note: if stopped from deleting our VPC because network interfaces are still attached to our VPC - delete all the attached network interfaces first!
+-   Select **NextWork-2-vpc**, then **Actions**, and **Delete VPC**.
+-   Type `delete` in the text box and click **Delete**.
+
+---
+##   VPC Monitoring with Flow Logs
+
+Network monitoring is how engineers keep track of their network's traffic and analyze it too.
+
+For example, network monitoring includes:
+1.   Checking the source of traffic coming into our VPC,
+2.   Analysing how much data is being transferred in our network, and
+3.   Identifying traffic that's been blocked by our security settings.
+
+Once we get to a more advanced stage, network monitoring also includes optimizing our network setup to speed up data transfers, automating responses to security threats, and so much more!
+
+**Step - 1 : Set up our VPCs in Minutes**
+
+Let's use VPC wizard to set up TWO VPCs in minutes. We can absolutely set up monitoring for architectures with a single VPC, but we're settings up two VPCs today so we can revise some learnings from the VPC peering project too!
+
+-   [Log in to our AWS Account](https://signin.aws.amazon.com/signin?redirect_uri=https%3A%2F%2Fconsole.aws.amazon.com%2Fconsole%2Fhome%3FhashArgs%3D%2523%26isauthcode%3Dtrue%26state%3DhashArgsFromTB_ap-southeast-2_fffdf5be4bb1a27e&client_id=arn%3Aaws%3Asignin%3A%3A%3Aconsole%2Fcanvas&forceMobileApp=0&code_challenge=m-aiqeB2UZeXTGXNyugMP8L64zd_AGUxJl4HLnA-X1o&code_challenge_method=SHA-256).
+-   Head to our **VPC console** - search for `VPC` at the search bar at top of our page.
+-   From the left hand navigation bar, select **Your VPCs**.
+
+**Create VPC 1**
+-   Select **Create VPC**.
+-   Select **VPC and more**.
+-   Under **Name tag auto-generation**, enter `NextWork-1`.
+-   The VPC's **IPv4 CIDR block** is already pre-filled to `10.0.0.0/16` - change that to `10.1.0.0/16`.
+-   For **IPv6 CIDR block**, we'll leave in the default option of **No IPv6 CIDR block**.
+-   For **Tenancy**, we'll keep the selection of **Default**.
+-   For **Number of Availability Zones (AZs)**, we'll use just `1` Availability Zone.
+-   Make sure the **Number of public subnets** chosen is `1`.
+-   For **Number of private subnets**, we'll keep thing simple and go with `0` private subnets.
+-   Next, for the **NAT gateways ($)** option, make sure we've selected **None**. As the dollar sign suggests, NAT gateways cost money!
+-   Next, for the **VPC endpoints** option, select **None**.
+-   We can leave the **DNS options** checked.
+-   Select **Create VPC**.
+-   Select **View VPC**.
+-   Select the **Resource map** tab - nice, all of these resources have been set up for us in a flash!
+
+**Set up VPC 2**
+-   Our second VPC has the exact same settings, except:
+      -   Under **Name tag auto-generation**, enter `NextWork-2`.
+      -   The VPC's **IPv4 CIDR block** should be unique! Make sure the CIDR block is `10.2.0.0/16` - NOT `10.1.0.0/16`.
+
+**Step - 2 : Launch EC2 Instances**
+
+We need to create these EC2 instances so that they can send data to each other later in the project, which gives us network activity to monitor.
+
+**Launch an instance in VPC 1**
+-   Head to the **EC2 console** - search for `EC2` in the search bar at the top of screen.
+-   Select **Instances** at the left hand navigation bar.
+-   Select **Launch instances**.
+-   Since our first EC2 instance will be launched in our first VPC, let's name it `Instance - NextWork VPC 1`.
+-   For the **Amazon Machine Image**, select **Amazon Linux 2023 AMI**.
+-   For the **Instance type**, select **t2.micro**.
+-   For the **Key pair (login)** panel, select **Proceed without a key pair (not recommended)**.
+-   At the **Network settings** panel, select **Edit** at the right hand corner.
+-   Under **VPC**, select **NextWork-vpc-1**.
+-   Under **Subnet**, select our VPC's public subnet.
+-   Keep the **Auto-assign public IP** setting to... do we remember whether our EC2 instance needs a public IP address?
+-   Select **Enable**.
+-   For the **Firewall (security groups)** setting, choose **Create security group**.
+-   Name our security group `NextWork-1-SG`.
+-   Choose **Add security group rule**.
+-   For the new rule's **Type**, select **All ICMP - IPv4**.
+-   For the new rule's **Source**, select `0.0.0.0/0`.
+
+![image alt](Networking-107)
+
+-   Select **Launch instance**.
+
+**Launch an instance in VPC 2**
+
+-   We use the same instructions above but make sure:
+      -   The **Name** is `Instance - NextWork VPC 2`.
+      -   The **VPC** is **NextWork-vpc-2**.
+      -   Make sure we select **Enable** for **Auto-assign public IP** here too
+      -   Name our security group `NextWork-2-SG`.
+      -   Allow ICMP traffic from ALL IP addresses.
+ 
+**Step - 3 : Set Up Flow Logs**
+
+Next up, we are ready to start monitoring VPC traffic! We're using a tool called **VPC flow logs** to do this... let's set them up in this step.
+
+-   Navigate to the **CloudWatch console** - search for `CloudWatch` in our Management Console's search bar.
+
+**Amazon CloudWatch** is a powerful monitoring service that watches over everything happening in our AWS environment in real time. AWS services would report to CloudWatch with their metrics, which are stats or measurements of the service's performance. We can then use CloudWatch to take these metrics and transform them into clear, easy-to-read graphs and dashboards to help us understand our AWS environment's performance and health health. For example, if we were hosting an application on AWS, our dashboard could track how quickly our app is loading for our users.
+
+Another great use case of CloudWatch is that we can set it to automatically do actions based on key metrics! For example, we could set CloudWatch to automatically shut down a VPC if it detects that it's letting in illegitimate traffic.
+
+-   Check the **Region** we're on - is this the same Region as the one we've used to launch our VPCs?
+      -   Double check our Region by looking at the top right hand corner of our console. Our Region is right next to our account name!
+ 
+CloudWatch data is region-specific! That means the data collected on our VPC in one region is not automatically available in other regions. If we're using a region outside of the one we used to launch our VPCs, we won't get access to CloudWatch's metrics on our VPC!
+
+-   At the left hand navigation panel, click **Log groups** under **Logs**.
+
+![image alt](Networking-108)
+
+-   Click **Create log group** at the top right.
+
+Think of a **log group** as a big folder in AWS where we keep related logs together. Usually, logs from the same source or application will go into the same log group, BUT logs are also region-specific. This means log data gets created and saved in the region it was created, although we can use CloudWatch dashboards to bring together logs from different regions.
+
+Logs are like a diary for our computer systems. They record everything that happens, from users logging in to errors popping up. It's the go-to place to understand what's going on with our systems, troubleshoot problems, and keep an eye on who’s doing what.
+
+-   Enter `NextWorkVPCFlowLogsGroup` as the **Log group name**.
+
+![image alt](Networking-109)
+
+-   That's it! Click **Create**.
+
+There were some interesting settings we skipped!
+1. **Retention setting** is **Never expire** by default, which means our logs won’t be deleted over time. They’ll stick around as long as we need them, unless we decide to clear them out ourself.
+
+![image alt](Networking-110)
+
+2. **Log class** is **Standard** by default, which means the logs that get created will get accessed or analyzed regularly.
+If we chose Infrequent Access instead, our logs will be stored for long-term archiving - we are charged less for storage, but higher for each time we need to access the, for analysis. This setting isn't quite important since our usage will fall under the Free Tier!
+
+![image alt](Networking-111)
+
+-   Head back to our **VPC console**.
+-   Select the **Your VPCs** page.
+-   Select **NextWork-1-vpc**.
+-   Scroll down to the **Flow Logs** tab, and click on **Create flow log**.
+
+Now that we know that logs are digital diaries that services keep, think of **flow logs** as a specific type of diary for VPCs. Flow logs capture traffic going to and from the network - noting down who's visiting our VPC and the specific network interface it going to!
+
+**Network interfaces** exist to connect our resources to our VPC! For example, whenever we launch an EC2 instance, AWS automatically creates a primary network interface with a private IP address from our subnet's IPv4 CIDR block. That's how our EC2 instance gets a private IP address. 
+They're not too important in simple networks like ours, but network interfaces become very powerful when we have complex network situations, like wanting an EC2 instance to belong to two subnets at once!
+
+**Flow logs** are associated with specific network interfaces because each interface represents a distinct point where traffic enters or exits an EC2 instance or other AWS resources. No two resources can share the same network interface!
+
+-   Welcome to the **Flow log settings** page! Nice, we've just unlocked a new section of VPC set up.
+-   Enter `NextWorkVPCFlowLog` in the **Name** field.
+-   Set **Filter** to **All**.
+
+![image alt](Networking-112)
+
+**Filter** setting in the context of VPC flow logs determines the type of traffic that is logged.
+1. Setting the filter to **All** means that it captures all the traffic flowing in and out of the VPC.
+2. The other option, **Accept**, means only traffic that was successfully allowed through our security groups and network ACLs get logged - great for understanding what kind of traffic is being let through.
+3. There's also a **Reject** filter that only captures the traffic blocked by our network settings - great for detecting illegitimate traffic trying to access our resources, or any network setting issues!
+
+-   Set the **Maximum aggregation interval** to **1 minute**.
+
+**Maximum aggregation interval** means how often traffic flow data will get lumped into a single flow log record. If we set the interval to '1 minute', flow log records are generated every minute. This gives us a more granular view of network traffic compared to '10 minutes', which would give we less frequent and potentially less detailed records.
+
+-   Leave **Destination** as **Send to CloudWatch Logs**.
+
+![image alt](Networking-113)
+
+Besides sending our flow logs straight to to CloudWatch, we can also send them to **Amazon S3**. This option is useful if we need to archive logs for cost-effective, long-term storage or use them with other analytics and processing tools in the future. **Amazon Data Firehose** is another destination! Data Firehose is a handy option that lets we process and analyze data in real-time (whereas S3 is better for storing large volumes of data that don't need real-time analysis).
+
+-   Set **Destination log group** as **NextWorkVPCFlowLogsGroup**.
+-   Under the **IAM role**, we might notice that there isn't an IAM role that's designed for Flow Logs!
+
+![image alt](Networking-114)
+
+**VPC Flow Logs doesn't have the permission to write logs and send them to CloudWatch... yet. Let's give Flow Logs the permission to do both, using the power of IAM roles and policies!**
+-   Select that handy **Set up permissions** link under **IAM role**.
+
+![image alt](Networking-115)
+
+-   In the navigation pane, choose **Policies**.
+-   Choose **Create policy**.
+-   Choose **JSON**.
+-   Delete everything in the **Policy editor**.
+-   Add this JSON policy to the empty Policy editor:
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents",
+        "logs:DescribeLogGroups",
+        "logs:DescribeLogStreams"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+```
+
+![image alt](Networking-116)
+
+-   Choose **Next**.
+-   For our policy's name, let's call it `NextWorkVPCFlowLogsPolicy`.
+-   Choose **Create policy**.
+-   In the left hand navigation pane, choose **Roles**.
+-   Choose **Create role**.
+-   For **Trusted entity type**, choose **Custom trust policy**.
+
+Custom trust policy is specific type of policy! They're different from IAM policies. While IAM policies help us define the actions a user/service can or cannot do, custom trust policies are used to very narrowly define who can use a role. By choosing a custom trust policy, we're making sure that only VPC Flow Logs can use this role.
+
+We could assign permissions using the "AWS service" option too but we can't actually find an option for VPC Flow Logs! VPC Flow Logs is technically just a feature within the wider Amazon VPC service (instead of being its own standalone AWS service), so we'd have to use a custom trust policy to assign permissions specifically to VPC Flow Logs.
+
+-   A custom trust policy panel pops up!
+-   Replace `"Principal": {}`, with the following:
+
+```json
+"Principal": {
+   "Service": "vpc-flow-logs.amazonaws.com"
+},
+```
+
+-   To avoid any errors, make sure the statement is well formatted and the spacing of our lines look exactly like this!
+
+![image alt](Networking-117)
+
+The statement `"Service": " vpc-flow-logs.amazonaws.com "` in a trust policy specifically points to VPC Flow Logs as the only service that can use this role! Even if we try to give this role to other AWS services, they can't use it because the permissions are locked down to just VPC Flow Logs. This is so good for security, in case this role gets accidentally assigned to another service/user.
+
+`"Principal"` defines the entity that is given the permissions in this policy. In this case, the entity is a service (VPC Flow Logs), but other entity types are IAM Users and IAM roles!
+
+-   Choose **Next**.
+-   On the **Add permissions** page, search for the policy we've created - `NextWorkVPCFlowLogsPolicy`.
+-   Select our policy.
+
+![image alt](Networking-118)
+
+-   Choose **Next**.
+-   Enter a name for our role - `NextWorkVPCFlowLogsRole`.
+-   Choose **Create role**.
+
+-   Head back to our VP console's **Create flow log** page.
+
+![image alt](Networking-119)
+
+-   Select the **refresh** button next to the IAM role field.
+-   Select our IAM role - **NextWorkVPCFlowLogsRole**.
+
+![image alt](Networking-120)
+
+-   Click on **Create flow log**.
+
+![image alt](Networking-121)
+
+Nice - the flow log is all set up! This means network traffic going into and out of our VPC is now getting tracked.
+
+**Step - 4 : Test VPC Peering**
+
+Let's generate some network traffic and see whether our flow logs can pick up on them. We're going to generate network traffic by trying to get our instance in VPC 1 to send a message to our instance in VPC 2.
+
+Since we're trying to get our instances to talk to each other, this means we're also testing our VPC peering setup at the same time!
+-   Head to our **EC2** console and the **Instances** page.
+-   Select the checkbox next to **Instance - NextWork VPC 1**.
+-   Select **Connect**.
+-   In the EC2 Instance Connect set up page, select **Connect** again.
+-   Phew! Success.
+
+![image alt](Networking-122)
+
+-   Leave open the **EC2 Instance Connect** tab, but head back to our **EC2** console in a new tab.
+-   Select **Instance - NextWork VPC 2**.
+-   Copy Instance - NextWork VPC 2's **Private IPv4 address**.
+
+This step is all about testing the peering connection between our EC2 instances. If the peering connection is succesful, our instances can communicate using each other's private IPv4 addresses. If they can't communicate using their private IPv4 addresses, then... we have an error! That's why it's a good idea to test with the private IPv4 addresses - using public IPv4 addresses wouldn't give us much information about whether the peering connection was successful!
+
+![image alt](Networking-123)
+
+-   Switch back to the **EC2 Instance Connect** tab.
+-   Run `ping [the Private IPv4 address you just copied]` in the terminal.
+      -   Our final result should look similar to something like `ping 10.0.1.227`.
+      -   Don't know where to enter this prompt? Look for the `$` sign at the bottom line of the black window, and type in our command after the `$` sign.
+ 
+**Ping** is a network tool used to check whether our computer can communicate with another computer or device on a network. When we "ping" a specific IP address, our server (in this case, Instance - NextWork VPC 1) sends a small packet of data to the target server (Instance - NextWork VPC 2), asking for a response. Ping will tell us whether we get a response back and how long it took to get a response.
+
+-   We should see a response similar to this:
+
+![image alt](Networking-124)
+
+If we don't get any replies (that's our situation right now), or if the replies stop suddenly, it's usually a sign that there's a problem with the connection. But we've made sure our security group allows inbound ICMP traffic, so what's happened here?
+
+-   Let's do some investigating... press **Ctrl + C** on our keyboard to end this ping test.
+-   See if we can test the connection from VPC 1 to VPC 2's **public** IP address.
+-   Head back to our EC2 console, and copy the **Public IPv4 address of Instance - NextWork VPC 2**.
+-   Head back to our **EC2 Instance Connect** tab and run a ping test with this public IPv4 address.
+-   Our final result should look similar to something like `ping [public IPv4 address]`.
+-   Do we get ping replies back?
+
+![image alt](Networking-125)
+
+Receiving ping replies from the public IPv4 address means Instance 2 is correctly configured to respond to ping requests, and Instance 1 can actually communicate with Instance 2 if it traffic goes across the public internet!
+
+
+
+
+
