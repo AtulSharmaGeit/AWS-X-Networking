@@ -1669,7 +1669,7 @@ If we don't get any replies (that's our situation right now), or if the replies 
 
 -   Let's do some investigating... press **Ctrl + C** on our keyboard to end this ping test.
 -   See if we can test the connection from VPC 1 to VPC 2's **public** IP address.
--   Head back to our EC2 console, and copy the **Public IPv4 address of Instance - NextWork VPC 2**.
+-   Head back to our **EC2** console, and copy the **Public IPv4 address of Instance - NextWork VPC 2**.
 -   Head back to our **EC2 Instance Connect** tab and run a ping test with this public IPv4 address.
 -   Our final result should look similar to something like `ping [public IPv4 address]`.
 -   Do we get ping replies back?
@@ -1678,7 +1678,664 @@ If we don't get any replies (that's our situation right now), or if the replies 
 
 Receiving ping replies from the public IPv4 address means Instance 2 is correctly configured to respond to ping requests, and Instance 1 can actually communicate with Instance 2 if it traffic goes across the public internet!
 
+-   In our **EC2 Instance Connect** page, press **Ctrl + C** on our keyboard again to end this ping test.
+-   Ping our EC2 Instance 2's **private** address again.
 
+![image alt](Networking-126)
 
+-   Still no replies with the **private** IP address.
 
+We receive ping replies when we use Instance 2's **public** IP address, which confirms that VPC 2's security groups and NACL's are letting in ICMP traffic. But using Instance 2's **private** IP address doesn't give us any ping replies.
 
+-   Leave open the **EC2 Instance Connect** tab, but head back to our **VPC** console in a new tab.
+-   In the VPC console, select the **Subnets** page.
+-   Select VPC 1's subnet i.e. **NextWork-1-subnet-public1-...**
+-   Let's investigate the **Route tables** and **Network ACL** tabs for our subnet.
+-   The network ACL allows all types of inbound traffic from anywhere! So this looks perfectly fine.
+-   But let's take a closer look at the route tables...
+-   Aha! Mystery solved.
+
+![image alt](Networking-127)
+
+The missing ingredient in our architecture is the **VPC peering connection** that directly connects VPCs 1 and 2. The purpose of a peering connection is to create a **direct** link between two resources so they can communicate with their private IP addresses. We'd be correct to say that Instance 1 and Instance 2 are currently connected through the route with a destination of 0.0.0.0/0, but that traffic is through the internet gateway i.e. traffic will travel through and be exposed to the public internet. To make sure communication between Instances 1 and 2 is direct, we need to set up a new route that directs traffic to our peering connection (instead of the public internet).
+
+-   Head to the VPC console, click on **Peering connections** on the left hand navigation panel.
+
+A VPC peering connection is a direct connection between two VPCs! A peering connection lets VPCs and their resources route traffic between them using their **private** IP addresses. This means data can now be transferred between VPCs without going through the public internet. Without a peering connection, data transfers between VPCs would use resources' public address - meaning VPCs have to communicate over the public internet!
+
+![image alt](Networking-128)
+
+-   Click on **Create peering connection** in the right hand corner.
+-   Name our **Peering connection name** as `VPC 1 <> VPC 2`.
+-   Select **NextWork-1-VPC** for our **VPC ID (Requester)**.
+
+In VPC peering, the Requester is the VPC that initiates a peering connection. As the requester, they will be sending the other VPC an invitation to connect!
+
+![image alt](Networking-129)
+
+-   Under **Select another VPC to peer with**, make sure **My Account** is selected.
+-   For **Region**, select **This Region**.
+-   For **VPC ID (Accepter)**, select **NextWork-2-VPC**.
+
+In VPC peering, the Accepter is the VPC that receives a peering connection request! The Accepter can either accept or decline the invitation. This means the peering connection isn't actually made until the other VPC also agrees to it!
+
+![image alt](Networking-130)
+
+-   Click on **Create peering connection**.
+-   Our newly created peering connection isn't finished yet! The green success bar says the peering connection has been requested.
+
+![image alt](Networking-131)
+
+-   On the next screen, select **Actions** and then select **Accept request**...!
+
+We set up the VPC peering connection as VPC 1 (the Requestor), but don't forget that the Accepter needs to approve of it too! By clicking **Accept request**, we were accepting the connection as VPC 2.
+
+![image alt](Networking-132)
+
+-   Click on **Accept request** again on the pop up panel.
+-   Click on **Modify my route tables now** on the top right corner.
+
+**Update VPC 1's route table**
+-   Select the checkbox next to VPC 1's route table i.e. called **NextWork-1-rtb-public**.
+-   Scroll down and click on the **Routes** tab.
+-   Click **Edit routes**.
+-   Let's add a new route!
+
+Even if our peering connection has been accepted, traffic in VPC 1 won't know how to get to resources in VPC 2 without a route in our route table! We need to set up a route that directs traffic bound for VPC 2 to the peering connection we've set up.
+
+-   Add a new route to **VPC 2** by entering the CIDR block `10.2.0.0/16` as our Destination.
+-   Under Target, select **Peering Connection**.
+-   Select **VPC 1 <> VPC 2**.
+
+![image alt](Networking-133)
+
+-   Click **Save changes**.
+-   Confirm that the new route appears in VPC 1's **Routes** tab!
+
+![image alt](Networking-134)
+
+**Update VPC 2's route table**
+-   We use the same instructions above but make sure:
+      -   The route table we're updating is **NextWork-2-rtb-public**.
+      -   The **Destination** is the CIDR block `10.1.0.0/16`
+      -   Save our changes!
+ 
+![image alt](Networking-135)
+
+-   Revisit the **EC2 Instance Connect** tab that's connected to NextWork Public Server.
+-   Woah! Lots of new lines coming through in the terminal.
+
+![image alt](Networking-136)
+
+Congratulations!!! We've successfully resolved the connectivity issue by setting up a peering architecture between VPC 1 and VPC 2!
+
+**Step - 5 : Analyze Flow Logs**
+
+Let's check out what VPC Flow Logs has recorded about our network's activity!
+-   Head to our **CloudWatch** console.
+-   Select **Log groups** from the left hand navigation panel.
+-   Click into **NextWorkVPCFlowLogsGroup**.
+-   Click into our log stream to see flow logs from EC2 Instance 1!
+
+![image alt](Networking-137)
+
+Log streams in CloudWatch are often named after the network interface ID (`eni-xxx`) when they're associated with VPC flow logs. This helps us organise which streams are tracking traffic to which resources in our VPC.
+
+`eni` = Elastic Network Interface (ENI)! If ever wonder how an EC2 instance can have a public/private IP address, security group rules and the option connect to other services in our AWS environment, the ENI is the answer. Think of ENI as a cloud networking component that attaches to an EC2 instance and gives the EC2 instance networking capabilities. Every EC2 instance must have an ENI to exist and be in a VPC.
+
+-   Oooo check out these **log events!**
+
+![image alt](Networking-138)
+
+-   Scroll to the very top and try expanding a log at the top - woahhh, welcome to this flow log.
+
+![image alt](Networking-139)
+
+This flow log shows that **344 bytes** of data were sent successfully from the IP address **18.237.140.165** to **10.1.5.112** using TCP protocol on **port 22**, with **4 packets** transferred and the traffic was allowed (**"ACCEPT"**). EC2 Instance Connect's IP address range in the Oregon region is 18.237.140.160/29, which means the source of traffic mentioned in this log is actually EC2 Instance Connect's direct access to Instance 1!
+
+-   Now scroll to the very bottom and select one of the newer logs, are there any differences?
+-   For example, we might find one that says **REJECT OK** instead of **ACCEPT OK** at the end. These would represent the ping messages that failed to reach Instance 2!
+
+![image alt](Networking-140)
+
+-   In the left hand navigation panel, click on **Logs Insights**.
+
+![image alt](Networking-141)
+
+**Logs Insights** is a CloudWatch feature that analyzes our logs. In Log Insights, we use queries to filter, process and combine data to helps us troubleshoot problems or better understand our network traffic!
+
+-   Select **NextWorkVPCFlowLogsGroup** from the **Select log group(s)** dropdown.
+-   Select the **Queries** folder on the right hand side.
+
+Queries are like commands we run to analyze our logs! We can use queries to filter logs, group data, and perform calculations like sums and averages. We use queries to extract specific information from large volumes of log data, making it easier to see trends, identify outliers, and troubleshoot issues. For example, if we're managing a network and traffic suddenly slows down, we could use queries to extract logs on the longest wait times in our network.
+
+![image alt](Networking-142)
+
+-   Under **Flow Logs**, select **Top 10 byte transfers by source and destination IP addresses**.
+
+The query **"Top 10 byte transfers by source and destination IP addresses"** is all about discovering the top 10 biggest data transfers between IP addresses in our network! We'll find out which resources are moving the most data, which uncovers the busiest traffic routes in our network.
+
+![image alt](Networking-143)
+
+-   Click **Apply**, and then **Run query**.
+
+![image alt](Networking-144)
+
+-   Review the query results... wow!
+
+![image alt](Networking-145)
+
+Out of all the logs that Flow Logs has captured, here are the ten pairs of source and destination IP addresses that transferred the most data between them. So as we might imagine, this is a great query for investigating any heavy traffic flows or unusual data transfers! The bar chart at the top is just a little visualization to show us how many logs were captured at specific times of the day. The table below are the actual results of our query.
+
+-   Can we map the logs with IP addresses we've come across during this project?
+
+![image alt](Networking-146)
+
+**Step - 6 : Delete Our Resources**
+
+Keeping track of our resources, and deleting them at the end, is absolutely a skill that will help us reduce waste in our account.
+
+**Delete our CloudWatch Log Group**
+-   In our **CloudWatch** console, select **Log groups** from the left hand navigation panel.
+-   Select our **NextWorkVPCFlowLogsGroup**.
+-   Click the **Actions** button, and select **Delete log group(s)**.
+-   Confirm by pressing the **Delete** button.
+
+![image alt](Networking-147)
+
+**Delete our EC2 Instances**
+-   Head back to the **Instances** page of our **EC2** console.
+-   Select the checkboxes next to **Instance - NextWork VPC 1** and **Instance - NextWork VPC 2**.
+-   Select **Instance state**, then select **Terminate Instance**.
+-   Select **Terminate**.
+
+**Delete VPC Peering Connections**
+-   Head back to our **VPC** console.
+-   Select **Peering connections** from our left hand navigation panel.
+-   Select the `VPC 1 <> VPC 2` peering connection.
+-   Select **Actions**, then **Delete peering connection**.
+-   Select the checkbox to **Delete related route table entries**.
+-   Type `delete` in the text box and click **Delete**.
+
+![image alt](Networking-148)
+
+**Delete our VPCs**
+-   Select **Your VPCs** from our left hand navigation panel.
+-   Select **NextWork-1-vpc**, then **Actions**, and **Delete VPC**.
+-   Type `delete` in the text box and click **Delete**.
+-   Note: if you get stopped from deleting our VPC because **network interfaces** are still attached to our VPC - delete all the attached network interfaces first!
+-   Select **NextWork-2-vpc**, then **Actions**, and **Delete VPC**.
+-   Type `delete` in the text box and click **Delete**.
+
+**Delete our CloudWatch IAM Role and Policy**
+-   Head to our **IAM** console.
+-   Select **Policies** from the left hand navigation panel.
+-   Search for `FlowLogs`, and select **NextWorkVPCFlowLogsPolicy**.
+-   Select **Delete**, then enter `NextWorkVPCFlowLogsPolicy` to confirm our deletion.
+-   Select **Roles** from the left hand navigation panel.
+-   Search for `FlowLogs`, and select **NextWorkVPCFlowLogsRole**.
+-   Select **Delete**, then enter `NextWorkVPCFlowLogsRole` to confirm our deletion.
+
+![image alt](Networking-149)
+
+---
+##   Access S3 from a VPC
+
+**Amazon S3** is a classic AWS service that doesn't live inside a VPC! **S3** is, by default, accessible from the internet, so we can manage its access and security without having to change network settings or internet gateways. And S3 is just the beginning. Services like AWS IAM, Amazon Route 53, and even databases like DynamoDB also live outside of our VPC.
+
+Engineers and companies combine lots of AWS services when they build applications, so resources inside our VPC need to know how to work with the other AWS services outside. Let’s kick off by accessing Amazon S3 from our VPC in this introductory project!
+
+**Step - 1 : Set up our VPC and EC2 Instance**
+-   [Log in to your AWS Account](https://signin.aws.amazon.com/signin?redirect_uri=https%3A%2F%2Fconsole.aws.amazon.com%2Fconsole%2Fhome%3FhashArgs%3D%2523%26isauthcode%3Dtrue%26state%3DhashArgsFromTB_ap-southeast-2_fffdf5be4bb1a27e&client_id=arn%3Aaws%3Asignin%3A%3A%3Aconsole%2Fcanvas&forceMobileApp=0&code_challenge=m-aiqeB2UZeXTGXNyugMP8L64zd_AGUxJl4HLnA-X1o&code_challenge_method=SHA-256).
+
+**Create Your VPC**
+-   Head to our **VPC** console - search for **VPC** at the search bar at top of our page.
+-   From the left hand navigation bar, select **Your VPCs**.
+-   Select **Create VPC**.
+-   Select **VPC and more**.
+-   Under **Name tag auto-generation**, enter `NextWork`.
+-   The VPC's **IPv4 CIDR block** is already pre-filled to `10.0.0.0/16` - we'll use this default CIDR block!
+-   For **IPv6 CIDR block**, we'll leave in the default option of **No IPv6 CIDR block**.
+-   For **Tenancy**, we'll keep the selection of **Default**.
+-   For **Number of Availability Zones (AZs)**, we'll use just `1` Availability Zone.
+-   Make sure the **Number of public subnets** chosen is `1`.
+-   For **Number of private subnets**, we'll keep thing simple today and go with `0` private subnets.
+-   For the **NAT gateways ($)** option, make sure we've selected **None**. As the dollar sign suggests, NAT gateways cost money!
+-   For the **VPC endpoints** option, select **None**.
+-   We can leave the **DNS options** checked.
+-   Select **Create VPC**.
+
+**Launch an instance in our VPC**
+-   Head to the **EC2 console** - search for `EC2` in the search bar at the top of screen.
+-   Select **Instances** at the left hand navigation bar.
+-   Select **Launch instances**.
+-   Since our first EC2 instance will be launched in our first VPC, let's name it `Instance - NextWork VPC Project`.
+-   For the **Amazon Machine Image**, select **Amazon Linux 2023 AMI**.
+-   For the **Instance type**, select **t2.micro**.
+-   For the **Key pair (login)** panel, select **Proceed without a key pair (not recommended)**.
+-   At the **Network settings** panel, select **Edit** at the right hand corner.
+-   Under **VPC**, select **NextWork-vpc**.
+-   Under **Subnet**, select our VPC's public subnet.
+-   Keep the **Auto-assign public IP** setting to **Enable**.
+-   For the **Firewall (security groups)** setting, choose **Create security group**.
+      -   Name your security group `SG - NextWork VPC Project`.
+      -   That's it! No security group rules to add.
+
+By default, this new security group allows all inbound SSH traffic. That's all we need to use EC2 Instance Connect later. We used to add an inbound rule to allow ICMP traffic - but we won't need it if we aren't running any ping tests!
+
+-   Select **Launch instance**.
+
+**Step - 2 : Connect to Our EC2 Instance**
+
+In this step, we're gonna connect to our EC2 instance and try access an AWS service!
+-   Head to our **EC2** console and the **Instances** page.
+-   Select the checkbox next to **Instance - NextWork VPC Project**.
+-   Select **Connect**.
+-   In the EC2 Instance Connect set up page, select **Connect** again.
+-   Yay! Successfully connected.
+
+![image alt](Networking-150)
+
+-   For our first command, try running `aws s3 ls`, which is a command used to list the S3 buckets in our account (yup, **ls** stands for list!).
+
+![image alt](Networking-151)
+
+-   Hmmm, doesn't look like a success. We need to provide credentials.
+
+Credentials in AWS are like keys that let us access and manage AWS services securely. Without credentials, we won't have the permission to do things like viewing our S3 bucket list.
+
+When we log into our AWS Management Console, we're already authenticated using our AWS user's details. Running commands from an EC2 instance is a different story! We can think of our EC2 instance as another user that needs its own username and password (i.e. credentials) to get access to our AWS account. Our account by default doesn't have credentials set up for running commands from an EC2 instance. We'll need to manually set these up to securely access and manage AWS services from our instance.
+
+-   Run `aws configure`
+-   The terminal is now asking us for an Access Key ID!
+
+![image alt](Networking-152)
+
+An access key ID is a part of a credential! Our credentials are made up of a username and password; think of the access key ID as the username. We don't automatically have one, but we can create access keys IDs through AWS IAM.
+
+Our EC2 instance needs credentials to access our AWS services, so let's set up access keys right away!
+-   Search for `Access keys` in the search bar.
+-   Aha! So it's the IAM console that helps us set this up. Select **IAM**.
+-   Search for `Access keys` again in the IAM console's left hand navigation panel.
+
+![image alt](Networking-153)
+
+-   Choose the search result for managing an access key for our IAM Admin account.
+
+![image alt](Networking-154)
+
+-   Select **Create access key**.
+-   On the first set up page, select **Command Line Interface (CLI)**.
+-   Select the checkbox that says **I understand the above recommendation and want to proceed to create an access key.**
+
+![image alt](Networking-155)
+
+In this project we're creating access keys and manually applying them in our EC2 instance, but typically the recommended way is to create an IAM role with the necessary permissions and then attaching that role to our EC2 instance. Our EC2 instance would inherit the permissions from the role, and this is best practice as we can easily attach and detach EC2 instances from roles to give and take away their credentials. We aren't using this method so that we can learn about access keys, but roles are usually a better alternative for security.
+
+-   Select **Next**.
+-   For the **Description tag value**, we'll write `Access key created to access an S3 bucket from an EC2 Instance. NextWork VPC project.`
+
+![image alt](Networking-156)
+
+-   Select **Create access key**.
+-   OOoo this is important! **STAY ON THIS PAGE**
+
+![image alt](Networking-157)
+
+This is the only time that our secret access key can be viewed or downloaded. We cannot recover it later. However, we can create a new access key any time.
+
+-   Select **Download .csv file** near the bottom of the page.
+
+**Step - 3 : Create an S3 bucket with 2 files**
+
+Before we jump back into our EC2 instance, let's create a bucket in Amazon S3. After creating this bucket, we'll learn how to access it from our EC2 instance and do things like checking what objects are in the bucket.
+
+-   Search for **S3** at the search bar at the top of our console.
+-   Make sure we're in the same Region as our NextWork VPC!
+-   Select **Create bucket**.
+-   Let's set up our bucket! Keep the **Bucket type** as **General purpose**.
+-   Our **bucket name** should be `nextwork-vpc-project-yourname`
+    -   Don't forget to replace **yourname** with our first name! **S3 bucket names need to be globally unique**.
+-   We'll leave all other default settings, go straight to **Create bucket**.
+
+Next, let's upload two files into the bucket. This can be any two files in our local computer!
+-   Click into our bucket.
+-   Select **Upload**.
+
+![image alt](Networking-159)
+
+-   Select **Add files** in the **Files and folders panel**.
+-   Select two files in our local computer to upload.
+
+Not sure what to upload? You can download and use these images instead! **Right click** on each link, select **Save link as**... and select **Save**.
+-   [NextWork - Denzel is awesome.png](https://storage.googleapis.com/nextwork_course_resources/courses/aws/AWS%20Project%20People%20projects/Project%3A%20VPC%20Endpoints/NextWork%20-%20Denzel%20is%20awesome.png)
+-   [NextWork - Lelo is awesome.png](https://storage.googleapis.com/nextwork_course_resources/courses/aws/AWS%20Project%20People%20projects/Project%3A%20VPC%20Endpoints/NextWork%20-%20Lelo%20is%20awesome.png)
+
+Our files should show up in our **Files and folders** panel once they're uploaded!
+
+![image alt](Networking-160)
+
+-   Select **Upload** at the bottom of the page.
+
+**Step - 4 : Connect to our S3 bucket**
+
+-   Now back to our **EC2 Instance Connect** tab!
+-   Are we ready to enter our **Access keys details now?**
+-   Open the **AccessKeys.csv** file we've downloaded.
+-   Copy the **Access key ID**.
+-   Paste this into our EC2 instance's terminal, and press **Enter** on our keyboard.
+
+![image alt](Networking-161)
+
+-   Let's do the same for the **AWS Secret Access Key!**
+-   Copy the key from our .csv file, and paste it in the terminal. Press **Enter**.
+-   Next, for our **Default region name**, open our **Region** dropdown on the top right hand corner of our AWS console.
+-   Copy our **Region's code name**. For example, us-west-2.
+-   Paste that in our EC2 instance's terminal. Press **Enter** on our keyboard.
+-   We don't have a default output format, so we can leave that empty. Press **Enter**.
+
+![image alt](Networking-162)
+
+-   Nice! Set up is done.
+-   Let's try running the `aws s3 ls` command again to see a list of our account's S3 buckets.
+
+Do we see a list of our buckets? We might have a shorter list than the one in this screenshot, but the only line to look out for is **vpc-project-yourname**.
+
+![image alt](Networking-163)
+
+-   Next, let's run the command `aws s3 ls s3://nextwork-vpc-project-yourname`. Make sure to replace `nextwork-vpc-project-yourname` with our actual bucket name.
+-   Based on the command, and what we've learnt about **aws s3 ls**, can we guess what this command does?
+-   Nice - we can even see the objects that are inside our bucket!
+
+![image alt](Networking-164)
+
+We can also upload files using AWS CLI too?!
+-   Run `sudo touch /tmp/test.txt` to create a blank .txt file in your EC2 instance.
+
+Let's break it down!
+      1.   **sudo** stands for "superuser do" and it's used when we're running a command that typicaly needs elevated user permissions, like installing software or creating new files.
+      2.   **touch** is a standard command used to create an empty file if it doesn't exist. If it does exist, this command will update the file's timestamp (i.e. the last time it was accessed) instead.
+      3.   **/tmp/** is a common directory path (we can think of a directory path as layers and layers of folders) typically used for temporary files.
+      4.   **test.txt** is the name of the empty file we're creating!
+
+-   Next, run `aws s3 cp /tmp/test.txt s3://nextwork-vpc-project-yourname` to upload that file into our bucket.
+
+Let's break it down!
+      1.   **aws s3 cp**: is the command to **copy** files.
+      2.   **/tmp/test.txt** is the **source file path**. It's saying that the file to copy is test.txt, which exists inside a folder called tmp.
+      3.   **s3://nextwork-vpc-project-yourname** is the **destination path**. It's saying that the file should be copied to the S3 bucket vpc-project-yourname!
+
+-   Finally, run `aws s3 ls s3://nextwork-vpc-project-yourname` again - what objects are listed in our bucket now?
+
+![image alt](Networking-165)
+
+The numbers next to each file name is the size of that file! Since test.txt is an empty file with no data, it has 0 bytes.
+
+-   Switch tabs back to our **S3** console.
+-   Refresh the **Objects** tab for our S3 bucket.
+-   Do we see our new file there?
+
+![image alt](Networking-166)
+
+A file we've created in our EC2 instance now lives in our S3 bucket too!
+
+---
+##   VPC Endpoints
+
+Previously we learnt how to use our VPC to **access other AWS services**, specifically S3. With direct access to our EC2 instance, we could use AWS CLI commands to see what objects are in our S3 bucket and even upload files! But there's just one thing... with this setup, our EC2 instance is accessing our S3 bucket through the **public internet**.
+
+When traffic is going through the internet, there is a higher risk of external threats and attacks looking at our data! For example, attackers can expose our EC2 instance's keys to our AWS account if they manage to break into the traffic between our instance and S3 bucket.
+
+**VPC endpoints** gives our VPC **private, direct access to other AWS services like S3**, so traffic doesn't need to go through the internet. Just like how internet gateways are like our VPC's door to the internet, we can think of VPC endpoints as private doors to specific AWS services.
+
+**Step - 1 : Create an endpoint**
+
+Our EC2 instance definitely has access to our bucket - our access key worked But our instance is connected to our bucket through the public internet. It's time we bring in VPC endpoints!
+-   In a new tab, head back to your **VPC** console.
+-   Select **Endpoints** from the left hand navigation panel.
+
+![image alt](Networking-167)
+
+-   Select **Create endpoint**.
+
+Not all AWS resources get launched inside our VPC! While our EC2 instances live within our VPC, S3 buckets and some other AWS services exist outside our VPC because they're designed to be highly available and accessible from anywhere. For example, the commands we're putting through AWS CLI now will be communicated to our S3 bucket through the public internet.
+
+That's why VPC endpoints exist to create a private connection between our VPC and AWS services. Having a VPC endpoint means our instances can now access services like S3 directly without routing through the public internet, which makes sure our data stays within the AWS network for security.
+
+-   For the **Name tag**, let's use `NextWork VPC Endpoint`.
+-   Keep the **Service category** as **AWS services**.
+
+![image alt](Networking-168)
+
+-   In the **Services** panel, search for `S3`.
+-   Select the filter result that just ends with **s3**.
+
+![image alt](Networking-169)
+
+-   Select the row with the **Type** set to **Gateway**.
+
+![image alt](Networking-170)
+
+A **Gateway** is a type of endpoint used specifically for Amazon S3 and DynamoDB (DynamoDB is an AWS database service). Gateways work by simply adding a route to our VPC route table that directs traffic bound for S3 or DynamoDB to head straight for the Gateway instead of the internet.
+
+As AWS evolved and more companies started using it for diverse and complex tasks, there was a need for more detailed control over how data moves within AWS networks. Gateway endpoints they could manage traffic but didn’t offer detailed settings - this led to AWS creating **Interface endpoints**, which offer more security settings.
+
+-   Next, at the **VPC** panel, select **NextWork-vpc**.
+-   We'll leave the remaining default values and select **Create endpoint**.
+
+![image alt](Networking-171)
+
+-   Select the checkbox next to our endpoint's name.
+
+![image alt](Networking-172)
+
+**Step - 2 : Create a super secure bucket policy**
+
+We're going to block off our S3 bucket from ALL traffic... except traffic coming from the endpoint. It's the ultimate test - if our endpoint was truly set up properly, then our EC2 instance should still be able to access S3. Otherwise, our instance's access is blocked!
+
+In our S3 bucket, we're going to kick things up a notch and make access super secure. Let's say we want to make this bucket completely private to ALL access... except access through the VPC endpoint we've set up.
+-   In the **S3** console, select **Buckets** from the left hand navigation panel.
+-   Click into our bucket **vpc-endpoints-yourname**.
+-   Select the **Permissions** tab.
+
+![image alt](Networking-173)
+
+-   Scroll to the **Bucket policy** panel, and select **Edit**.
+
+A bucket policy is a type of IAM policy designed for setting access permissions to an S3 bucket. Using bucket policies, we get to decide who can access the bucket and what actions they can perform with it.
+
+-   Add the below bucket policy to the policy editor.
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:*",
+      "Resource": [
+        "arn:aws:s3:::your-bucket-name",
+        "arn:aws:s3:::your-bucket-name/*"
+      ],
+      "Condition": {
+        "StringNotEquals": {
+          "aws:sourceVpce": "vpce-xxxxxxx"
+        }
+      }
+    }
+  ]
+}
+```
+
+This policy **denies** all actions (`s3:*`) on our S3 bucket and its objects to everyone (`Principal: "*"`)... unless the access is from the VPC endpoint with the ID defined in `aws:sourceVpce`. In other words, only traffic coming from our VPC endpoint can get any access to our S3 bucket!
+
+Don't forget to replace:
+1.   BOTH instances of **arn:aws:s3:::your-bucket-name** with our actual bucket ARN.
+      -   Handy tip: we can find our Bucket ARN right above the Policy window
+  
+![image alt](Networking-174)
+
+1.   **vpce-xxxxxxx** with our VPC endpoint's ID.
+      -   To find this ID, we'll have to switch back to our **Endpoints** tab and copy our endpoint's ID. Make sure it starts with `vpce-`.
+  
+![image alt](Networking-175)
+
+After replacing the default values with our resources' ARN or ID, double check that we haven't deleted the quote marks around any of our statements. Also check that we still have `/*` at the second Resource line!
+
+-   Select **Save changes**.
+
+Woah! Once we've saved our changes, panels have turned red all across the screen.
+
+![image alt](Networking-176)
+
+Our policy denies all actions unless they come from our VPC endpoint. This means any attempt to access our bucket from other sources, including the AWS Management Console, is blocked!
+
+**Step - 3 : Access Our S3 bucket again!**
+
+Now that our S3 bucket's access is only limited to our endpoint, can our EC2 instance still access our bucket?
+
+If it can, we've set up our endpoint connection perfectly.
+
+If it can't, something's gone wrong with our VPC endpoint set up...
+
+-   Head back to **EC2 Instance Connect**.
+-   Try running `aws s3 ls s3://nextwork-vpc-endpoints-yourname` again.
+-   Ah! Access denied. It looks like the bucket policy had stopped us.
+
+![image alt](Networking-177)
+
+-   Troubleshoot this error by heading to our VPC console.
+-   Select **Subnets** from the left hand navigation panel.
+-   Select our public subnet, which starts with **NextWork-subnet-public1**.
+-   Select the **Route table** tab.
+-   Aha! Mystery solved.
+
+![image alt](Networking-178)
+
+If our route table doesn't have a route that directs traffic bound for S3 to our VPC endpoint, traffic from our EC2 instance is actually trying to get to our S3 bucket through the public internet instead.
+
+-   Let's make sure our public subnet has a route to our endpoint.
+-   Select **Endpoints** from the left hand navigation panel.
+-   Select the checkbox next to our endpoint, and select **Route tables**.
+-   Select **Manage route tables**.
+
+![image alt](Networking-179)
+
+-   Select the checkbox next to our public route table.
+-   Select **Modify route tables**.
+
+![image alt](Networking-180)
+
+-   Head back to the **Subnets** page.
+-   Select the refresh button next to the **Actions** dropdown.
+-   Check the **Route table** tab for our public subnet again.
+
+![image alt](Networking-181)
+
+Nice! there's a route to the VPC endpoint now.
+
+To validate our work, let's get our EC2 instance to interact with our S3 bucket one last time.
+
+-   Back in our **EC2 Instance Connect** tab, run `aws s3 ls s3://nextwork-vpc-endpoints-yourname` again.
+-   WOOOHOOOO! We're back.
+
+![image alt](Networking-182)
+
+-   Congrats on making a successful VPC endpoint connection!
+
+**VPC endpoints can be configured using policies too!**
+-   We'll do a simple configuration - switch to our **Endpoints** tab.
+-   Select the checkbox next to our policy.
+-   Select the **Policy** tab.
+-   Ooo! By default, our VPC endpoint allows access to all AWS services.
+-   Select **Edit policy**.
+-   Change the line **"Effect": "Allow"** to `"Effect": "Deny"`!
+
+![image alt](Networking-183)
+
+-   Click **Save**.
+-   Switch back to our EC2 Instance Connect tab.
+-   Run `aws s3 ls s3://nextwork-vpc-endpoints-yourname` - what do we see now?
+-   Wow! The endpoint policy now stops us from accessing our S3 bucket.
+
+![image alt](Networking-184)
+
+This is a great tool to quickly block off access if we suspect attackers are using our endpoint to access our resources! Instantly switch the effect to Deny, and our Gateway is closed. We could also use VPC endpoint policies to be even more granular with the way we give away access to our AWS services. For example, we can write a policy that gives our endpoint read access only to S3 buckets, so the permission to upload objects is denied.
+
+-   Switch tabs back to our **Endpoints** page.
+-   Select **Edit Policy**.
+-   Change the policy back to `"Effect": "Allow"` - this will be important when it comes to deleting our resources later!
+-   Select **Save changes**.
+
+![image alt](Networking-185)
+
+**Step - 4 : Delete Our Resources**
+
+Keeping track of our resources, and deleting them at the end, is absolutely a skill that will help us reduce waste in our account.
+
+**Delete our S3 Buckets**
+-   Head to our **S3** console.
+-   Select the **Buckets** page.
+-   Select our **nextwork-vpc-endpoints-yourname**, and select **Delete**.
+-   Enter our bucket name, and select **Delete bucket**.
+-   Oh no!
+
+![image alt](Networking-186)
+
+-   Deleting our bucket from the console is not possible - don't forget, our S3 bucket policy literally denies everyone else (**except** traffic from the VPC endpoint) access to the bucket.
+-   Our only option is to delete our bucket through the EC2 instance!
+-   Switch tabs to our instance's terminal.
+-   Run the command `aws s3 rb s3://nextwork-vpc-endpoints-yourname`.
+
+`rb` is a command that deletes our bucket! This means `rb s3://nextwork-vpc-endpoints-yourname` is used to delete our S3 bucket nextwork-vpc-endpoints-yourname.
+
+![image alt](Networking-187)
+
+-   Nope! The delete failed - we need to make sure our bucket is empty first.
+-   To delete everything in our bucket, run the command `aws s3 rm s3://nextwork-vpc-endpoints-yourname --recursive`
+
+`rm` stands for "remove" and is used to remove things inside our bucket. `--recursive` means the remove command should include all objects and subdirectories inside our bucket. This is a super helpful command to run before delete a non-empty bucket.
+
+![image alt](Networking-188)
+
+-   Run the command `aws s3 rb s3://nextwork-vpc-endpoints-yourname` again.
+
+![image alt](Networking-189)
+
+-   That's our S3 bucket successfully removed.
+-   Let's check it's gone by running `aws s3 ls` one last time - does our bucket still show in the list of results?
+
+![image alt](Networking-190)
+
+**Delete our EC2 Instance**
+-   Head back to the **Instances** page of our EC2 console.
+-   Select the checkboxes next to **Instance - NextWork VPC Endpoint**.
+-   Select **Instance state**, then select **Terminate Instance**.
+-   Select **Terminate**.
+
+**Delete our VPC Endpoint**
+-   Head back to the **Endpoints** page of our VPC console.
+-   Select the checkbox next to our endpoint.
+-   Select the **Actions** dropdown.
+-   Select **Delete VPC endpoints**.
+
+**Delete our VPCs**
+-   Select **Your VPCs** from our left hand navigation panel.
+-   Select **NextWork-vpc**, then **Actions**, and **Delete VPC**.
+-   Type `delete` in the text box and click **Delete**.
+-   Note: if we get stopped from deleting our VPC because **network interfaces** are still attached to our VPC - delete all the attached network interfaces first!
+
+Other network components should be automatically deleted with our VPC, but it's always a good idea to check anyway.
+
+**Delete our IAM Access Keys**
+Head to our **IAM** console.
+Select **Users**.
+Select our **Security credentials** tab.
+Scroll down to our **Access keys** panel and select the **Actions** drop down.
+Select **Delete**.
+At the popup panel, select **Deactivate**, and enter our **access key ID** into the text field.
+Select **Delete**.
+Last but definitely not least - don't forget to delete the local access key **.csv file** saved on our local computer!
+
+![image alt](Networking-191)
