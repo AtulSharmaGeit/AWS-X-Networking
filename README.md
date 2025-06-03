@@ -1,7 +1,7 @@
 # AWS X Networking
 
 ## Project Overview
-In this project, you’ll build an isolated network on AWS using a VPC. Key tasks include configuring subnets and attaching an Internet Gateway.
+These projects collectively provide hands-on experience in designing, securing, and managing **AWS network architectures**. They cover foundational VPC setup, advanced security and monitoring, hybrid and inter-VPC connectivity, and private access to AWS services. The projects span various aspects of AWS networking, including VPC configuration, security, private connectivity, EC2 integration, peering, monitoring, S3 access, and endpoints.
 
 ---
 
