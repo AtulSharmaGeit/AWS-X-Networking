@@ -36,11 +36,11 @@ VPCs are the reason why resources can be made private to us. We also get control
 
 - Make sure we're on the **Region** that's closest to us. Use the dropdown on the top right hand corner to switch Regions.
 
-![image alt](Networking-1)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-1.png)
 
 - We'll notice that there is already a VPC in your account!
 
-![image alt](Networking-2)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-2.png)
 
 When we created our AWS account, AWS automatically sets up a **default VPC** for us! This default VPC is why we could launch resources (e.g. EC2 instances) and connect services together from Day 1 of using AWS. If it didn't exist, we would've had to learn how to create a VPC before we can use some of the services that need VPCs to function. This default VPC is a handy starting point, especially for beginners, but we can always create custom VPCs to fit specific requirements e.g. strict security measures.
 
@@ -51,7 +51,7 @@ When we created our AWS account, AWS automatically sets up a **default VPC** for
 - **Name** : `NextWork VPC`
 - **IPv4 CIDR** : `10.0.0.0/16`
 
-![image alt](Networking-3)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-3.png)
 
 - Select **Create VPC** to finish setting up your VPC.
 
@@ -74,13 +74,13 @@ An AWS Region is made of clusters of data centers dotted around the Region. Thes
    - **IPv4 VPC CIDR block**: `10.0.0.0/16`
    - **IPv4 subnet CIDR block**: `10.0.0.0/24`
  
-![image alt](Networking-4)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-4.png)
 
 - Choose **Create subnet**.
 - Select the checkbox next to **Public 1**.
 - In the **Actions** menu, select **Edit subnet settings**.
 
-![image alt](Networking-5)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-5.png)
 
 - Check the box next to **Enable auto-assign public IPv4 address**.
 - Choose **Save**.
@@ -104,11 +104,11 @@ An existing internet gateway in our AWS account comes with the default VPC that 
    - **Name tag** : `NextWork IG`
 - Choose **Create internet gateway**.
 
-![image alt](Networking-6)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-6.png)
 
 - Select your newly created internet gateway and choose **Actions**, then **Attach to VPC**.
 
-![image alt](Networking-7)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-7.png)
 
 - Select **NextWork VPC**.
 - Select **Attach internet gateway**.
@@ -139,7 +139,7 @@ When a subnet's route table has a route that directs internet-bound traffic to t
 
 One of our route tables was created with our AWS account's default VPC! This is a route table with two routes inside:
 
-![image alt](Networking-8)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-8.png)
 
 Let's decode the routes inside this table:
    - **Route 0.0.0.0/0 | igw**- directs traffic to the default internet gateway.
@@ -162,13 +162,13 @@ AWS also created the other route table automatically when we set up **NextWork V
 - Enter the name `NextWork route table`.
 - Select **Save**.
 
-![image alt](Networking-9)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-9.png)
 
 - Select the **Routes** tab.
 - Choose **Edit routes**.
 - Choose **Add route** near the bottom of the page.
 
-![image alt](Networking-10)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-10.png)
 
 - Destination: `0.0.0.0/0`
 
@@ -179,7 +179,7 @@ Routing rules are evaluated from the most restrictive (i.e. destinations with th
 - Target: **Internet Gateway**.
 - Select **NextWork IG**.
 
-![image alt](Networking-11)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-11.png)
 
 - Choose **Save changes**.
 - Choose the **Subnet associations** tab.
@@ -187,7 +187,7 @@ Routing rules are evaluated from the most restrictive (i.e. destinations with th
 - Select **Public 1**.
 - Choose **Save associations**.
 
-![image alt](Networking-12)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-12.png)
 
 Our subnet is now public because it is connected to the Internet via the internet gateway!
 
@@ -210,11 +210,11 @@ Security groups are responsible for checking who comes in and out. They have str
 
 **Why do we already have existing security groups?** - AWS automatically creates a default security group for each new VPC, which allows all traffic between resources within the same VPC. This default rule enables secure communication between resources without exposing them to external threats! AWS does not charge for creating and maintaining security groups.
 
-![image alt](Networking-13)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-13.png)
 
 - Choose **Create security group**.
 
-![image alt](Networking-14)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-14.png)
 
 - Security group name:  `NextWork Security Group`
 - Description:`A Security Group for the NextWork VPC.`
@@ -226,7 +226,7 @@ Security groups are responsible for checking who comes in and out. They have str
 - Type: `HTTP`
 - Source: `Anywhere-IPv4`
 
-![image alt](Networking-15)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-15.png)
 
 The yellow popup in your image is a warning from AWS. AWS is concerned that the security rule we've just set, i.e. setting the source to `0.0.0.0/0`, allows any IP address to access our resource. This wide-open access can be risky, exposing our server to potential threats from any location. AWS suggests tightening our security by restricting access to only known IP addresses, which would limit who can reach our server and help keep it safe from unwanted or malicious traffic.
 
@@ -236,7 +236,7 @@ But, setting the inbound rule to allow HTTP traffic from `0.0.0.0/0` (meaning an
 
 **What about outbound rules?** **We only created an inbound rule**. By default, AWS security groups already allow all outbound traffic. So unless we specify otherwise, any resource associated with the security group can access and send data to any IP address - whether it's in our VPC, other VPCs (if we have the right permissions) and on the public internet!
 
-![image alt](Networking-16)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-16.png)
 
 **Step - 3 : Create a Network ACL**
 
@@ -249,15 +249,15 @@ Nice, that's our traffic flow (route table) and basic security (security groups)
 
 - Oooo existing ACLs!
 
-![image alt](Networking-17)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-17.png)
 
 AWS sets up a **default network ACL** for every VPC in our account. This default is designed to allow all traffic to move freely until we decide to customize the rules to fit our needs.
 
 - Choose the network ACL that's associated with your **Public 1** subnet, and check out the tabs for **Inbound rules** and **Outbound rules**.
 
-![image alt](Networking-18)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-18.png)
 
-![image alt](Networking-18')
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-18'.png)
 
 Network ACLs use inbound and outbound rules to decide which data packets are allowed to enter or leave subnets:
    - **Rule 100 Inbound** allows all inbound traffic into the Public Subnet.
@@ -272,13 +272,13 @@ To solidify our learnings, let's recreate this set up ourselves in the console! 
 - VPC: **NextWork VPC**
 - Select **Create network ACL**.
 
-![image alt](Networking-19)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-19.png)
 
 - Uncheck the default network ACL we've selected.
 - Select the checkbox next to **NextWork Network ACL**.
 - Select the **Inbound rules** tab.
 
-![image alt](Networking-20)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-20.png)
 
 **There is only one rule that denies all traffic!** The **default** network ACLs that AWS creates allow all inbound and outbound traffic. But for custom network ACLs that we create, all inbound and outbound traffic are denied until we add rules about the kind of traffic we'll allow.
 
@@ -294,7 +294,7 @@ In network ACLs, rule numbers decide the order that rules are checked—lower nu
 
 - Source: `0.0.0.0/0`
 
-![image alt](Networking-21)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-21.png)
 
 - Click **Save changes**.
 
@@ -312,7 +312,7 @@ Just like attaching internet gateways to VPCs, we need to associate network ACLs
 
 - Under the **Subnet associations** tab, select **Edit subnet associations**.
 
-![image alt](Networking-22)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-22.png)
 
 - Select your **Public 1** subnet.
 - Select **Save changes**.
@@ -336,7 +336,7 @@ Let's set up our very first private subnet and learn its differences from a publ
 -   Select **Create subnet**.
 -   Aha! An error message.
 
-![image alt](Networking-23)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-23.png)
 
 The error message says: **CIDR Address overlaps with existing Subnet CIDR: 10.0.0.0/24**. This error pops up when the CIDR block we're trying to assign to a new subnet is already being used by another subnet in the same VPC. Every subnet in a VPC must have a unique CIDR block so traffic is routed correctly and there are no conflicts.
 
@@ -348,13 +348,13 @@ By setting the CIDR block of our new private subnet to `10.0.1.0/24`, we allocat
 
 The Public 1 subnet is defined with the CIDR block `10.0.0.0/24`, which is a different range of IP addresses from `10.0.0.0` to `10.0.0.255`.
 
-![image alt](Networking-24)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-24.png)
 
 -   Select **Create subnet**.
 -   Success!
 -   To tidy up our subnets' naming conventions, let's retitle our **Public 1** subnet to `NextWork Public Subnet`.
 
-![image alt](Networking-25)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-25.png)
 
 **Step - 2 : Set up a private route table**
 
@@ -369,24 +369,24 @@ Back when we set up **NextWork route table**, we renamed the default route table
 -   Under **VPC**, select **NextWork VPC**.
 -   Select **Create route table**.
 
-![image alt](Networking-26)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-26.png)
 
 -   Nice! With our private route table set up, let's make sure it can only direct traffic to another internal resource (instead of the public internet).
 -   Select **NextWork Private Route Table**.
 -   Check the **Routes** tab - does it only have one default route with a **local** target?
 
-![image alt](Networking-27)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-27.png)
 
 -   Switch tabs to **Subnet associations**.
 -   Select **Edit subnet associations** under the **Explicit subnet associations** tab.
 -   Select the checkbox next to **NextWork Private Subnet**.
 -   Select **Save associations**.
 
-![image alt](Networking-28)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-28.png)
 
 -   To tidy up your Route tables' naming conventions, let's also retitle **NextWork route table** to `NextWork Public Route Table`.
 
-![image alt](Networking-29)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-29.png)
 
 **Step - 3 : Set up a private network ACL**
 -   Select **Network ACLs** from the left hand navigation panel.
@@ -394,7 +394,7 @@ Back when we set up **NextWork route table**, we renamed the default route table
       -   Note that this is NOT **NextWork Network ACL** - our default ACL isn't named!
 -   Select the **Inbound rules** and **Outbound rules** tabs.
 
-![image alt](Networking-30)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-30.png)
 
 We might recall that there is a default network ACL set up for every VPC. This default network ACL is associated with our private subnet, since we haven't set up an explicit association between our private subnet and another network ACL. A VPC's default network ACL allows **all** traffic, which exposes our private subnet to unrestricted access from the internet or other untrusted networks. Let's set up a new network ACL that restricts traffic and protects our private subnet!
 
@@ -410,20 +410,20 @@ Removing a route to the internet gateway does prevent direct internet access to 
 
 Remember that **custom network ACLs** start with denying all inbound and outbound traffic!
 
-![image alt](Networking-31)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-31.png)
 
-![image alt](Networking-32)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-32.png)
 
 -   Switch tabs to **Subnet associations**.
 -   Select **Edit subnet associations**.
 -   Select your private subnet.
 -   Select **Save changes**.
 
-![image alt](Networking-33)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-33.png)
 
 -   To tidy up your Network ACLs' naming conventions, let's also rename **NextWork Network ACL** to `NextWork Public NACL`.
 
-![image alt](Networking-34)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-34.png)
 
 All done! Your private subnet is set up and ready to go.
 
@@ -442,7 +442,7 @@ Let's kick things off by launching an EC2 instance in our public subnet.
 -   For the **Amazon Machine Image**, select **Amazon Linux 2023 AMI**.
 -   For the **Instance type**, select **t2.micro**.
 
-![image alt](Networking-35)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-35.png)
 
 An **AMI** is a template or blueprint used to create EC2 instances and contains the operating system along with the applications needed to launch the instance. **Instance types** cover the 'hardware' components - CPU power, memory size, storage space and more!
 
@@ -453,7 +453,7 @@ An **AMI** is a template or blueprint used to create EC2 instances and contains 
 -   For the **Key pair name**, use `NextWork key pair`.
 -   Keep the **Key pair type** as **RSA**, and the **Private key file format** as **.pem**
 
-![image alt](Networking-36)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-36.png)
 
 **Key pair type** determines the algorithm used for generating the key pair's cryptographic keys.
 
@@ -474,7 +474,7 @@ By default, all resources are launched into the default VPC that AWS has set up 
 -   For the **Firewall (security groups)**, we've already created the security group for our public subnet's resources. Choose **Select existing security group**.
 -   Select **NextWork Public Security Group**.
 
-![image alt](Networking-37)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-37.png)
 
 -   Select **Launch instance**.
 -   Click into our instance once it's successfully launched.
@@ -484,7 +484,7 @@ By default, all resources are launched into the default VPC that AWS has set up 
 -   Switch the tab to **Networking**.
 -   Notice how our public server has a Public IPv4 address, a subnet it's associated with, an Availability zone it's launched in, and a VPC ID that links it with NextWork VPC too.
 
-![image alt](Networking-38)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-38.png)
 
 **Availability Zone** is the specific area within our AWS Region that our instance is hosted.
 
@@ -519,7 +519,7 @@ SSH, or Secure Shell, is the protocol we use for this secure access to a remote 
 
 In terms of network communication, SSH is also as a type of network traffic. Once SSH has established a secure connection between us and the EC2 instance, all data transmitted (including our commands and the responses from the instance) is encrypted. This encryption makes SSH an ideal method for securely exchanging confidential data e.g. login credentials!
 
-![image alt](Networking-39)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-39.png)
 
 This popup says "Rules with source of `0.0.0.0/0` allow all IP addresses to access our instance. We recommend setting security group rules to allow access from known IP addresses only."
 
@@ -530,7 +530,7 @@ AWS is concerned that the default security rule, i.e. with the source being `0.0
 
 Choosing the **NextWork Public Security Group** as the source means only resources that are part of the NextWork Public Security Group can communicate with our instance. This restricts access to a much smaller group of trusted resources, rather than allowing potentially any IP address on the internet (0.0.0.0/0) to access our instance. A great move for securing a private subnet!
 
-![image alt](Networking-40)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-40.png)
 
 -   Select **Launch instance**.
 
@@ -548,7 +548,7 @@ Keeping track of our resources, and deleting them at the end, is absolutely a sk
 -   Type `delete` at the bottom of the pop up panel.
 -   Select **Delete**.
 
-![image alt](Networking-40')
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-40'.png)
 
 Now visit each of the pages below! **Refresh** our the page before checking if the resource we created is still in our account. They should be automatically deleted with our VPC, but it's always a good idea to check anyway:
       1.   Subnets
@@ -574,7 +574,7 @@ Let's try a new way to create our entire VPC setup (it's a time saver)
 -   We previously stuck to creating a VPC only, but this time select **VPC and more**.
 -   Woah! A visual flow diagram pops up that shows us other VPC resources. This is called a **VPC resource map**!
 
-![image alt](Networking-41)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-41.png)
 
 With VPC resource map, we can quickly understand the architectural layout of a VPC, like the number of subnets, which subnets are associated with which route table, and which route tables have routes to an internet gateway.
 
@@ -588,7 +588,7 @@ With VPC resource map, we can quickly understand the architectural layout of a V
       3.   How many route tables are being created in our VPC? Why?
       4.   Is there an internet gateway being created?
  
-![image alt](Networking-42)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-42.png)
 
 Here are the answers!
 -   There are **4 subnets** being created.
@@ -620,7 +620,7 @@ Tenancy in AWS refers to the type of hardware our instances run on. We have two 
 -   For **Number of Availability Zones (AZs)**, we'll leave the default value of `2` for now and come back to this soon.
 -   Expand the **Customize AZs** arrow. Ooo we can even configure which two Availability Zones we'd like to set up for this VPC!
 
-![image alt](Networking-43)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-43.png)
 
 -   Next, notice that **Number of public subnets** only gives us two options - `0` or `2`.
 
@@ -634,17 +634,17 @@ This is **AWS' best practice** advice at work! When we pick 2 Availability Zones
 
 -   Try selecting the option for 4 private subnets, and watch our resource map update itself!
 
-![image alt](Networking-44)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-44.png)
 
 **Why do we have 5 route tables?** In a VPC, **public subnets** usually share a single route table because they all need to route traffic to the internet through the same internet gateway. This simplifies management since all public subnets follow the same rules for internet access. For **private subnets**, each one often has its own route table to control and customize traffic routing more precisely. This allows for different routing rules and security controls for each private subnet. 
 
-![image alt](Networking-45)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-45.png)
 
 -   PAUSE - what will happen if we change the number of Availability Zones from `2` to `1`?
 -   Make our prediction on how this resource map will look differently...
 -   Scroll back to the Availability Zone field, and change the selection from `2` to `1`!
 
-![image alt](Networking-46)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-46.png)
 
 Changing the number of availability zones updates the number of subnets and route tables to keep things balanced and reliable. Fewer zones mean fewer resources are needed to maintain that balance and reliability.
 
@@ -655,11 +655,11 @@ Changing the number of availability zones updates the number of subnets and rout
  
 **Why do the subnets' default CIDR blocks finish in /20 by default?** The default /20 subnet provides 4,096 IP addresses, which is a good middle ground for most use cases. Typically the norm is to use **/8 /16 /24 /32**. The /20 size offers a balance between too few and too many IP addresses, making it useful for most network setups without overwhelming us with an excessive number of IPs.
 
-![image alt](Networking-47)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-47.png)
 
 -   Next, for the **NAT gateways ($)** option, make sure we've selected **None**. As the dollar sign suggests, NAT gateways cost money!
 
-![image alt](Networking-48)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-48.png)
 
 **NAT gateways** let instances in private subnets access the internet for updates and patches, while blocking inbound traffic. For example, our private server in our private subnet might need to download security updates. By using a NAT gateway, the server can access these updates securely while remaining protected from external threats!
 
@@ -671,7 +671,7 @@ Private subnets are meant to keep our instances isolated from the public interne
 
 -   Next, for the **VPC endpoints** option, select **None**.
 
-![image alt](Networking-49)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-49.png)
 
 Normally, to access some AWS services like S3 from our VPC, our traffic would go out to the public internet. But, VPC endpoints let us connect our VPC privately to AWS services without using the public internet. This means our data stays within the AWS network, which can improve security and reduce data transfer costs.
 
@@ -686,18 +686,18 @@ When we enable **DNS resolution**, AWS takes care of translating these hostnames
 -   Select **Create VPC**.
 -   Super satisfying to see this loading bar of our VPC and its resources getting created!
 
-![image alt](Networking-50)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-50.png)
 
 -   Select **View VPC**.
 -   Select the **Resource map** tab.
 
-![image alt](Networking-51)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-51.png)
 
 -   Note how name tag auto-generation, which we enabled in the set up page, is at work now - all of our VPC's resources have `nextwork` at the start of the name!
 -   Within our resource map, click on our **public subnet**.
 -   Oooo, now we get to see how our public subnet is connected to a public route table and our internet gateway.
 
-![image alt](Networking-52)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-52.png)
 
 **Validate and rename your resources**
 
@@ -782,7 +782,7 @@ Let's tidy up our resources' names! Take 3 minutes to rename our:
 -   Switch the tab to **Networking**.
 -   Notice how NextWork Public Server has a Public IPv4 address, a subnet, an Availability zone, and a VPC ID.
 
-![image alt](Networking-53)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-53.png)
 
 **Launch a new EC2 instance in NextWork Private Subnet**
 -   Select **Launch instances** again.
@@ -802,7 +802,7 @@ Let's tidy up our resources' names! Take 3 minutes to rename our:
 
 Choosing the **NextWork Public Security Group** as the source means only resources that are part of the NextWork Public Security Group can communicate with your instance.
 
-![image alt](Networking-54)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-54.png)
 
 -   Select **Launch instance**.
 
@@ -817,14 +817,14 @@ Connectivity testing often involves fine-tuning our security group settings and 
 
 -   Keep all of the default settings.
 
-![image alt](Networking-55)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-55.png)
 
 **EC2 Instance Connect** is an alternative way to use SSH - Instance Connect lets us securely connect to our EC2 instances directly using the AWS Management Console. We're still using SSH, but with all the key management handling it for us. This takes away a lot of the complexity of setting up SSH.
 
 -   Select Connect.
 -   Oh no! We've failed to connect to our instance?
 
-![image alt](Networking-56)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-56.png)
 
 Let's investigate what happened by reviewing our security settings.
 -   Head back to our **VPC console**.
@@ -832,9 +832,9 @@ Let's investigate what happened by reviewing our security settings.
 -   Select the checkbox next to **NextWork Public Subnet**.
 -   Hmm let's take a look! Investigate the **Route table** and **Network ACL** tabs - what do we see?
 
-![image alt](Networking-57)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-57.png)
 
-![image alt](Networking-58)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-58.png)
 
 Everything looks good! Our Network ACL allows all traffic in and out, and our route table is correctly setting up a route to the Internet Gateway.
 
@@ -844,7 +844,7 @@ Everything looks good! Our Network ACL allows all traffic in and out, and our ro
 -   Select the **Inbound rules** tab.
 -   Aha! Mystery solved.
 
-![image alt](Networking-59)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-59.png)
 
 Security group associated with NextWork Public Server lets in all inbound HTTP traffic, but this is not how we're trying to access our Public Server! We're trying to access NextWork Public Server using SSH through EC2 Instance Connect, which is a different traffic type.
 
@@ -857,14 +857,14 @@ In this step, we are updating NextWork Public Server's security group so it can 
 
 Setting the source to Anywhere-IPv4 makes sure that EC2 Instance Connect will be successful, no matter which IP address it's using. If this was a long-term project, we'd search for the specific CIDR block of IP addresses that EC2 Instance Connect uses and restrict inbound SSH traffic to that range.
 
-![image alt](Networking-60)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-60.png)
 
 -   Select **Save rules**.
 -   With that modified, refresh our EC2 console's **Instances** page.
 -   Select our **Public Server** and select **Connect** again.
 -   Phew! Success.
 
-![image alt](Networking-61)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-61.png)
 
 **Step - 3 : Test connectivity between our EC2 instances**
 
@@ -876,7 +876,7 @@ Let's see if we can connect with our Private Server from here.
 -   Select **NextWork Private Server**.
 -   Copy our private server's **Private IPv4 address**.
 
-![image alt](Networking-62)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-62.png)
 
 -   Switch back to the **EC2 Instance Connect** tab.
 -   Run `ping [the Private IPv4 address you just copied]` in terminal.
@@ -889,7 +889,7 @@ If we receive a response quickly, it means the connection between our computer a
 
 -   We should see a response similar to this:
 
-![image alt](Networking-63)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-63.png)
 
 This single line indicates that our Public Server has sent out a ping message... and that's about it. Usually, when we ping another computer successfully, we should see several replies back instantly. Each reply tells us how long it took for the message to go to the Private Server and come back.
 
@@ -904,7 +904,7 @@ If we don't get any replies (that's our situation right now), or if the replies 
 -   Let's investigate the **Route tables** and **Network ACL** tabs for our private subnet.
 -   Aha! Mystery solved.
 
-![image alt](Networking-64)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-64.png)
 
 **How are the Route tables and Network ACLs the cause of our connectivity issue?** Our route table is set up perfectly (zero issues there!), but the Network ACL tab shows us that all traffic inbound and outbound are denied. This means even if our route table correctly directs the ping to NextWork Private Server, the network ACL is checking the ping traffic at the entrance of our private subnet. If it finds that ICMP traffic is not allowed, it stops the ping there. This blockage could be the reason why we observed only one line in the ping response - the single line records NextWork Public Server's first attempt to communicate (i.e. a ping message is sent), but there are no replies back from NextWork Private Server.
 
@@ -922,7 +922,7 @@ When we set a rule for **All ICMP - IPv4**, we're allowing all types of ICMP mes
 -   Set the **Source** to traffic coming from our public subnet - `10.0.0.0/24`.
 -   Select **Save changes**.
 
-![image alt](Networking-65)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-65.png)
 
 -   Let's apply the same to Outbound rules.
       -   Rule number: `100`.
@@ -932,7 +932,7 @@ When we set a rule for **All ICMP - IPv4**, we're allowing all types of ICMP mes
 -   Select **NextWork Private Security Group**.
 -   Check your **Inbound rules** tab - does this security group allow ICMP traffic? (Nope!)
 
-![image alt](Networking-66)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-66.png)
 
 Now that our private network ACLs allow ICMP traffic, ICMP messages can enter our public subnet. However, these messages still need to be let in by our **NextWork Private Security Group** to reach our private server. So if our security group isn't allowing in ICMP traffic too, the ping message wouldn't reach our private server!
 
@@ -941,7 +941,7 @@ Now that our private network ACLs allow ICMP traffic, ICMP messages can enter ou
 -   For **Type**, select **All ICMP - IPv4**.
 -   For **Source**, select **NextWork Public Security Group**.
 
-![image alt](Networking-67)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-67.png)
 
 **We didn't pick NextWork Public Security Group as the source for the network ACL... why is the source different here?** Notice how we can select traffic from the **NextWork Public Security Group** as a source here, which is much more granular and exclusive than the private NACL, which allows in all traffic from our public subnet. NACLs typically have a broader scope since its settings would affect all resources in our subnet.
 
@@ -949,7 +949,7 @@ Now that our private network ACLs allow ICMP traffic, ICMP messages can enter ou
 -   Revisit the **EC2 Instance Connect** tab that's connected to NextWork Public Server.
 -   Woah! Lots of new lines coming through in the terminal.
 
-![image alt](Networking-68)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-68.png)
 
 The multiple new lines appearing in our terminal are a sign of successful communication between the two EC2 instances! Each line represents a reply from the ping command we sent. This means that the ICMP (Internet Control Message Protocol) traffic is now successfully reaching the private server, thanks to the adjustments we made in the network ACLs and Security Groups.
 
@@ -962,7 +962,7 @@ Since our NextWork Public Route Table has a route from the NextWork Public Subne
 -   Type in `curl example.com` in the prompt, i.e. right after the $ sign at the bottom line of the black window.
 -   We should see a response similar to this!
 
-![image alt](Networking-69)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-69.png)
 
 Just like ping, **curl** is a tool to test connectivity in a network. Where ping checks if one computer can contact another (and how long messages take to travel back and forwth), curl is used to transfer data to or from a server. That means on top of checking connectivity, we can use curl to grab data from, or upload data into other servers on the internet!
 
@@ -972,13 +972,13 @@ When we use the `curl` command followed by a website address, e.g. `example.com`
 -   This wouldn't be possible if NextWork Public Subnet, our internet gateway and our security settings weren't set up properly... nice work!
 -   Now let's run `curl nextwork.org`
 
-![image alt](Networking-70)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-70.png)
 
 The output **Found** typically means that the website at the URL we entererd has moved to a new URL! This is true - `nextwork.org` currently redirects requests to the first project on our web app, which has a different URL!
 
 -   Now let's try running curl with the URL that our terminal returned. Run `curl https://learn.nextwork.org/projects/aws-host-a-website-on-s3`
 
-![image alt](Networking-71)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-71.png)
 
 Just like the previous example using `curl example.com`, curl has fetched the complete HTML content of NextWork's web app (specifically, the first project on the web app), which is why we now see a large amount of HTML data. We've just used our Public Server to fetch all the HTML code necessary to render a webpage!
 
@@ -1000,7 +1000,7 @@ Just like the previous example using `curl example.com`, curl has fetched the co
 -   Type `delete` at the bottom of the pop up panel.
 -   Select **Delete**.
 
-![image alt](Networking-72)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-72.png)
 
 Now visit each of the pages below!
 
@@ -1025,7 +1025,7 @@ Now that we've learnt about the VPC wizard, let's use it to set up TWO VPCs in m
 -   Select **Create VPC**.
 -   We previously stuck to creating a VPC only, but this time let's select **VPC and more**.
 
-![image alt](Networking-73)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-73.png)
 
 **Create VPC 1**
 -   Under **Name tag auto-generation**, enter `NextWork-1`.
@@ -1040,7 +1040,7 @@ Since we're setting up 3 VPCs, it's easier to remember their CIDR blocks if thei
 -   For **Number of private subnets**, we'll keep thing simple today and go with `0` private subnets.
 -   We updated our subnets' CIDR blocks in previous projects, but we don't need defined subnets for this one. Let's skip the Customize subnets CIDR for this project.
 
-![image alt](Networking-74)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-74.png)
 
 -   Next, for the **NAT gateways ($)** option, make sure you've selected **None**. As the dollar sign suggests, NAT gateways cost money!
 
@@ -1053,7 +1053,7 @@ VPC endpoints let us connect our VPC privately to AWS services without using the
 -  We can leave the **DNS options** checked.
 -  Select **Create VPC**.
 
-![image alt](Networking-75)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-75.png)
 
 -   Select **View VPC**.
 -   Select the **Resource map** tab - nice, all of these resources have been set up for us in a flash!
@@ -1086,7 +1086,7 @@ Now that we have two VPCs ready to go, let's bridge them together with a peering
 
 A peering connection lets VPCs and their resources route traffic between them using their private IP addresses. This means data can now be transferred between VPCs without going through the public internet. Without a peering connection, data transfers between VPCs would use resources' public address - meaning VPCs have to communicate over the public internet.
 
-![image alt](Networking-76)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-76.png)
 
 -   Click on **Create peering connection** in the right hand corner.
 -   Name our **Peering connection** name as `VPC 1 <> VPC 2`
@@ -1094,7 +1094,7 @@ A peering connection lets VPCs and their resources route traffic between them us
 
 In VPC peering, the Requester is the VPC that initiates a peering connection. As the requester, they will be sending the other VPC an invitation to connect!
 
-![image alt](Networking-77)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-77.png)
 
 -   Under **Select another VPC to peer with**, make sure **My Account** is selected.
 
@@ -1105,23 +1105,23 @@ VPC peering can occur between VPCs in **different AWS accounts**! This flexibili
 
 In VPC peering, the **Accepter** is the VPC that receives a peering connection request! The Accepter can either accept or decline the invitation. This means the peering connection isn't actually made until the other VPC also agrees to it!
 
-![image alt](Networking-78)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-78.png)
 
 -   Click on **Create peering connection**.
 -   Our newly created peering connection isn't finished yet! The green success bar says the peering connection has been requested.
 
-![image alt](Networking-79)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-79.png)
 
 -   On the next screen, select **Actions** and then select **Accept request**... Get ready to take a screenshot!
 
 We set up the VPC peering connection as VPC 1 (the Requestor), but don't forget that the Accepter needs to approve of it too! By clicking Accept request, we were accepting the connection as VPC 2.
 
-![image alt](Networking-80)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-80.png)
 
 -   Click on **Accept request** again on the pop up panel.
 -   Click on **Modify my route tables now** on the top right corner.
 
-![image alt](Networking-81)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-81.png)
 
 **Step - 3 : Update Route Tables**
 
@@ -1139,12 +1139,12 @@ Even if our peering connection has been accepted, traffic in VPC 1 won't know ho
 -   Under Target, select **Peering Connection**.
 -   Select **VPC 1 <> VPC 2**.
 
-![image alt](Networking-82)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-82.png)
 
 -   Click **Save changes**.
 -   Oops! We've hit an error.
 
-![image alt](Networking-83)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-83.png)
 
 The message says the destination we've put in has the same CIDR block as VPC 1's own CIDR block! Whoops that was a typo - VPC 2's CIDR block is actually 10.**2**.0.0/16. Route tables cannot differentiate between local and remote destinations if they share the same CIDR block. Imagine if we didn't set up VPC 2 with its own unique CIDR block in the previous step! We'd get into trouble here.
 
@@ -1153,13 +1153,13 @@ The message says the destination we've put in has the same CIDR block as VPC 1's
 -   Click **Save changes** again.
 -   Confirm that the new route appears in VPC 1's **Routes** tab now!
 
-![image alt](Networking-84)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-84.png)
 
 **Update VPC 2's route table**
 -   The route table we're updating is **NextWork-2-rtb-public**.
 -   The **Destination** is the CIDR block `10.1.0.0/16`.
 
-![image alt](Networking-85)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-85.png)
 
 **Step - 4 : Launch EC2 Instances**
 
@@ -1186,7 +1186,7 @@ Launch an EC2 instance in each VPC, so we can use them to test our VPC peering c
 -   The **Name** is `Instance - NextWork VPC 2`.
 -   The **VPC** is **NextWork-vpc-2**.
 
-![image alt](Networking-86)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-86.png)
 
 **Step - 5 : Connect to Instance 1**
 
@@ -1195,7 +1195,7 @@ To test our VPC peering connection, we'll need to get one of our EC2 instances t
 -   Still in our **EC2 console**, select the checkbox next to **Instance - NextWork VPC 1**.
 -   Select **Connect**.
 
-![image alt](Networking-87)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-87.png)
 
 Check out the error message: **"No public IPv4 address assigned. With no public IPv4 address, you can't use EC2 Instance Connect."**
 
@@ -1203,18 +1203,18 @@ Keeping **Disable** for the **Auto-assign IP address** option in our EC2 instanc
 
 -   Verify this by heading back to the **Instances** page in our EC2 console, and checking the Public IPv4 address field... it's empty!
 
-![image alt](Networking-88)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-88.png)
 
 -   On our EC2 console's left hand navigation panel, select **Elastic IPs**.
 
-![image alt](Networking-90)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-90.png)
 
 **Elastic IPs** are static IPv4 addresses that get allocated to our AWS account, and is ours to delegate to an EC2 instance. Elastic IPs are also a great way to assign an instance a public IPv4 address after launching it!
 
 -   Select **Allocate Elastic IP** addresses.
 -   Leave all default options.
 
-![image alt](Networking-89)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-89.png)
 
 This setting is asking us to choose the source of the Elastic IP address. Since IPv4 addresses are unique on the internet, the IPv4 address we are allocated has to come from somewhere and can't overlap with other existing IPv4 addresses! The default setting is **Amazon's pool of IPv4 addresses**. Think of this as a public pool of all IPv4 addresses that Amazon has saved to allocate to AWS accounts, so we won't need to find one yourself.
 
@@ -1225,11 +1225,11 @@ If we have our own pool of IP addresses, we can also set those up in our AWS acc
 -   Select the **Actions** dropdown, then select **Associate Elastic IP address**.
 -   Under **Instance**, select **Instance - NextWork VPC 1**.
 
-![image alt](Networking-91)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-91.png)
 
 -   Click **Associate**.
 
-![image alt](Networking-92)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-92.png)
 
 This setting isn't quite relevant to us since our EC2 Instance only has one private IP address, but it becomes very important if an EC2 instance has multiple private IPs.
 
@@ -1238,29 +1238,29 @@ This setting isn't quite relevant to us since our EC2 Instance only has one priv
 -   Select the checkbox next to **Instance - NextWork VPC 1**.
 -   Do you see a **Public IPv4 address** for our EC2 instance now?
 
-![image alt](Networking-93)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-93.png)
 
 Looks like the IP address should be all resolved now... let's try connecting to our EC2 instance again!
 -   Select **Connect**.
 -   In the EC2 Instance Connect set up page, select **Connect** again.
 -   Oh no! We've failed to connect to our instance?!
 
-![image alt](Networking-94)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-94.png)
 
 -   Head back to our **VPC console**.
 -   Select **Subnets** from the left hand navigation panel.
 -   Select the checkbox next to **NextWork-1-subnet-public1**...
 -   Hmm let's take a look! Investigate the **Route table** and **Network ACL** tabs - what do we see?
 
-![image alt](Networking-95)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-95.png)
 
-![image alt](Networking-96)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-96.png)
 
 Everything looks good! Our Network ACL allows all traffic in and out, and our route table is correctly setting up a route to the Internet Gateway. That leaves one more thing to investigate...
 
 -   Copy the **VPC ID** of **NextWork-1-vpc**.
 
-![image alt](Networking-97)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-97.png)
 
 -   Head into the **Security groups** page from the left hand navigation panel.
 -   Woah it's a bunch of nameless security groups!
@@ -1268,12 +1268,12 @@ Everything looks good! Our Network ACL allows all traffic in and out, and our ro
 -   Click into the search bar, and paste the ID we copied into the search bar. Make sure there aren't any empty spaces before our text.
 -   Select the filter!
 
-![image alt](Networking-98)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-98.png)
 
 -   Nice, that narrowed it nicely for us. Select the checkbox next to VPC 1's **default** security group.
 -   Select the **Inbound rules** tab.
 
-![image alt](Networking-99)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-99.png)
 
 -   Aha! Mystery solved.
 
@@ -1285,14 +1285,14 @@ The answer lies in the **Source** of our security group's inbound rules. We're t
 -   Then, under **Source type**, select **Anywhere-IPv4**.
 -   Select **Save rules**.
 
-![image alt](Networking-100)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-100.png)
 
 -   With that modified, refresh our EC2 console's **Instances** page.
 -   Select our **Instance-NextWork VPC 1** and select **Connect** again.
 -   Select **Connect** in the EC2 Instance Connect setup page.
 -   Phew! Success.
 
-![image alt](Networking-101)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-101.png)
 
 **Step - 6 : Test VPC Peering**
 
@@ -1302,7 +1302,7 @@ We've figured out how to connect with VPC 1's Instance! Let's see if we can conn
 -   Select **Instance - NextWork VPC 2**.
 -   Copy Instance - NextWork VPC 2's **Private IPv4 address**.
 
-![image alt](Networking-102)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-102.png)
 
 -   Switch back to the **EC2 Instance Connect** tab.
 -   Run `ping [the Private IPv4 address we just copied]` in the terminal.
@@ -1313,7 +1313,7 @@ We've figured out how to connect with VPC 1's Instance! Let's see if we can conn
 
 -   We should see a response similar to this:
 
-![image alt](Networking-103)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-103.png)
 
 This single line indicates that our Instance - NextWork VPC 1 has sent out a ping message... and that's about it. If we don't get any replies (that's our situation right now), or if the replies stop suddenly, it's usually a sign that there's a problem with the connection.
 
@@ -1328,7 +1328,7 @@ One common reason for these issues is that the target server (Instance - NextWor
 -   Before we finish, let's check the security groups!
 -   Copy the **VPC ID** of VPC 2.
 
-![image alt](Networking-104)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-104.png)
 
 -   Select **Security groups** from the left hand navigation panel.
 -   Paste the **VPC ID** in the search bar, and select the suggested filter.
@@ -1345,12 +1345,12 @@ When we set a rule for **All ICMP - IPv4**, we're allowing all types of ICMP me
 -   Set the **Source** to traffic coming from **VPC 1** - `10.1.0.0/16`
 -   Select **Save rules**.
 
-![image alt](Networking-105)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-105.png)
 
 -   Revisit the **EC2 Instance Connect** tab that's connected to **Instance - NextWork VPC 1**.
 -   Woah! Lots of new lines coming through in the terminal.
 
-![image alt](Networking-106)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-106.png)
 
 The multiple new lines appearing in your terminal are a sign of successful communication between the two EC2 instances. 
 
@@ -1456,7 +1456,7 @@ We need to create these EC2 instances so that they can send data to each other l
 -   For the new rule's **Type**, select **All ICMP - IPv4**.
 -   For the new rule's **Source**, select `0.0.0.0/0`.
 
-![image alt](Networking-107)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-107.png)
 
 -   Select **Launch instance**.
 
@@ -1486,7 +1486,7 @@ CloudWatch data is region-specific! That means the data collected on our VPC in 
 
 -   At the left hand navigation panel, click **Log groups** under **Logs**.
 
-![image alt](Networking-108)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-108.png)
 
 -   Click **Create log group** at the top right.
 
@@ -1496,19 +1496,19 @@ Logs are like a diary for our computer systems. They record everything that happ
 
 -   Enter `NextWorkVPCFlowLogsGroup` as the **Log group name**.
 
-![image alt](Networking-109)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-109.png)
 
 -   That's it! Click **Create**.
 
 There were some interesting settings we skipped!
 1. **Retention setting** is **Never expire** by default, which means our logs won’t be deleted over time. They’ll stick around as long as we need them, unless we decide to clear them out ourself.
 
-![image alt](Networking-110)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-110.png)
 
 2. **Log class** is **Standard** by default, which means the logs that get created will get accessed or analyzed regularly.
 If we chose Infrequent Access instead, our logs will be stored for long-term archiving - we are charged less for storage, but higher for each time we need to access the, for analysis. This setting isn't quite important since our usage will fall under the Free Tier!
 
-![image alt](Networking-111)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-111.png)
 
 -   Head back to our **VPC console**.
 -   Select the **Your VPCs** page.
@@ -1526,7 +1526,7 @@ They're not too important in simple networks like ours, but network interfaces b
 -   Enter `NextWorkVPCFlowLog` in the **Name** field.
 -   Set **Filter** to **All**.
 
-![image alt](Networking-112)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-112.png)
 
 **Filter** setting in the context of VPC flow logs determines the type of traffic that is logged.
 1. Setting the filter to **All** means that it captures all the traffic flowing in and out of the VPC.
@@ -1539,19 +1539,19 @@ They're not too important in simple networks like ours, but network interfaces b
 
 -   Leave **Destination** as **Send to CloudWatch Logs**.
 
-![image alt](Networking-113)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-113.png)
 
 Besides sending our flow logs straight to to CloudWatch, we can also send them to **Amazon S3**. This option is useful if we need to archive logs for cost-effective, long-term storage or use them with other analytics and processing tools in the future. **Amazon Data Firehose** is another destination! Data Firehose is a handy option that lets we process and analyze data in real-time (whereas S3 is better for storing large volumes of data that don't need real-time analysis).
 
 -   Set **Destination log group** as **NextWorkVPCFlowLogsGroup**.
 -   Under the **IAM role**, we might notice that there isn't an IAM role that's designed for Flow Logs!
 
-![image alt](Networking-114)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-114.png)
 
 **VPC Flow Logs doesn't have the permission to write logs and send them to CloudWatch... yet. Let's give Flow Logs the permission to do both, using the power of IAM roles and policies!**
 -   Select that handy **Set up permissions** link under **IAM role**.
 
-![image alt](Networking-115)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-115.png)
 
 -   In the navigation pane, choose **Policies**.
 -   Choose **Create policy**.
@@ -1578,7 +1578,7 @@ Besides sending our flow logs straight to to CloudWatch, we can also send them t
 }
 ```
 
-![image alt](Networking-116)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-116.png)
 
 -   Choose **Next**.
 -   For our policy's name, let's call it `NextWorkVPCFlowLogsPolicy`.
@@ -1602,7 +1602,7 @@ We could assign permissions using the "AWS service" option too but we can't actu
 
 -   To avoid any errors, make sure the statement is well formatted and the spacing of our lines look exactly like this!
 
-![image alt](Networking-117)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-117.png)
 
 The statement `"Service": " vpc-flow-logs.amazonaws.com "` in a trust policy specifically points to VPC Flow Logs as the only service that can use this role! Even if we try to give this role to other AWS services, they can't use it because the permissions are locked down to just VPC Flow Logs. This is so good for security, in case this role gets accidentally assigned to another service/user.
 
@@ -1612,7 +1612,7 @@ The statement `"Service": " vpc-flow-logs.amazonaws.com "` in a trust policy spe
 -   On the **Add permissions** page, search for the policy we've created - `NextWorkVPCFlowLogsPolicy`.
 -   Select our policy.
 
-![image alt](Networking-118)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-118.png)
 
 -   Choose **Next**.
 -   Enter a name for our role - `NextWorkVPCFlowLogsRole`.
@@ -1620,16 +1620,16 @@ The statement `"Service": " vpc-flow-logs.amazonaws.com "` in a trust policy spe
 
 -   Head back to our VP console's **Create flow log** page.
 
-![image alt](Networking-119)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-119.png)
 
 -   Select the **refresh** button next to the IAM role field.
 -   Select our IAM role - **NextWorkVPCFlowLogsRole**.
 
-![image alt](Networking-120)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-120.png)
 
 -   Click on **Create flow log**.
 
-![image alt](Networking-121)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-121.png)
 
 Nice - the flow log is all set up! This means network traffic going into and out of our VPC is now getting tracked.
 
@@ -1644,7 +1644,7 @@ Since we're trying to get our instances to talk to each other, this means we're 
 -   In the EC2 Instance Connect set up page, select **Connect** again.
 -   Phew! Success.
 
-![image alt](Networking-122)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-122.png)
 
 -   Leave open the **EC2 Instance Connect** tab, but head back to our **EC2** console in a new tab.
 -   Select **Instance - NextWork VPC 2**.
@@ -1652,7 +1652,7 @@ Since we're trying to get our instances to talk to each other, this means we're 
 
 This step is all about testing the peering connection between our EC2 instances. If the peering connection is succesful, our instances can communicate using each other's private IPv4 addresses. If they can't communicate using their private IPv4 addresses, then... we have an error! That's why it's a good idea to test with the private IPv4 addresses - using public IPv4 addresses wouldn't give us much information about whether the peering connection was successful!
 
-![image alt](Networking-123)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-123.png)
 
 -   Switch back to the **EC2 Instance Connect** tab.
 -   Run `ping [the Private IPv4 address you just copied]` in the terminal.
@@ -1663,7 +1663,7 @@ This step is all about testing the peering connection between our EC2 instances.
 
 -   We should see a response similar to this:
 
-![image alt](Networking-124)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-124.png)
 
 If we don't get any replies (that's our situation right now), or if the replies stop suddenly, it's usually a sign that there's a problem with the connection. But we've made sure our security group allows inbound ICMP traffic, so what's happened here?
 
@@ -1674,14 +1674,14 @@ If we don't get any replies (that's our situation right now), or if the replies 
 -   Our final result should look similar to something like `ping [public IPv4 address]`.
 -   Do we get ping replies back?
 
-![image alt](Networking-125)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-125.png)
 
 Receiving ping replies from the public IPv4 address means Instance 2 is correctly configured to respond to ping requests, and Instance 1 can actually communicate with Instance 2 if it traffic goes across the public internet!
 
 -   In our **EC2 Instance Connect** page, press **Ctrl + C** on our keyboard again to end this ping test.
 -   Ping our EC2 Instance 2's **private** address again.
 
-![image alt](Networking-126)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-126.png)
 
 -   Still no replies with the **private** IP address.
 
@@ -1695,7 +1695,7 @@ We receive ping replies when we use Instance 2's **public** IP address, which co
 -   But let's take a closer look at the route tables...
 -   Aha! Mystery solved.
 
-![image alt](Networking-127)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-127.png)
 
 The missing ingredient in our architecture is the **VPC peering connection** that directly connects VPCs 1 and 2. The purpose of a peering connection is to create a **direct** link between two resources so they can communicate with their private IP addresses. We'd be correct to say that Instance 1 and Instance 2 are currently connected through the route with a destination of 0.0.0.0/0, but that traffic is through the internet gateway i.e. traffic will travel through and be exposed to the public internet. To make sure communication between Instances 1 and 2 is direct, we need to set up a new route that directs traffic to our peering connection (instead of the public internet).
 
@@ -1703,7 +1703,7 @@ The missing ingredient in our architecture is the **VPC peering connection** tha
 
 A VPC peering connection is a direct connection between two VPCs! A peering connection lets VPCs and their resources route traffic between them using their **private** IP addresses. This means data can now be transferred between VPCs without going through the public internet. Without a peering connection, data transfers between VPCs would use resources' public address - meaning VPCs have to communicate over the public internet!
 
-![image alt](Networking-128)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-128.png)
 
 -   Click on **Create peering connection** in the right hand corner.
 -   Name our **Peering connection name** as `VPC 1 <> VPC 2`.
@@ -1711,7 +1711,7 @@ A VPC peering connection is a direct connection between two VPCs! A peering conn
 
 In VPC peering, the Requester is the VPC that initiates a peering connection. As the requester, they will be sending the other VPC an invitation to connect!
 
-![image alt](Networking-129)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-129.png)
 
 -   Under **Select another VPC to peer with**, make sure **My Account** is selected.
 -   For **Region**, select **This Region**.
@@ -1719,18 +1719,18 @@ In VPC peering, the Requester is the VPC that initiates a peering connection. As
 
 In VPC peering, the Accepter is the VPC that receives a peering connection request! The Accepter can either accept or decline the invitation. This means the peering connection isn't actually made until the other VPC also agrees to it!
 
-![image alt](Networking-130)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-130.png)
 
 -   Click on **Create peering connection**.
 -   Our newly created peering connection isn't finished yet! The green success bar says the peering connection has been requested.
 
-![image alt](Networking-131)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-131.png)
 
 -   On the next screen, select **Actions** and then select **Accept request**...!
 
 We set up the VPC peering connection as VPC 1 (the Requestor), but don't forget that the Accepter needs to approve of it too! By clicking **Accept request**, we were accepting the connection as VPC 2.
 
-![image alt](Networking-132)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-132.png)
 
 -   Click on **Accept request** again on the pop up panel.
 -   Click on **Modify my route tables now** on the top right corner.
@@ -1747,12 +1747,12 @@ Even if our peering connection has been accepted, traffic in VPC 1 won't know ho
 -   Under Target, select **Peering Connection**.
 -   Select **VPC 1 <> VPC 2**.
 
-![image alt](Networking-133)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-133.png)
 
 -   Click **Save changes**.
 -   Confirm that the new route appears in VPC 1's **Routes** tab!
 
-![image alt](Networking-134)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-134.png)
 
 **Update VPC 2's route table**
 -   We use the same instructions above but make sure:
@@ -1760,12 +1760,12 @@ Even if our peering connection has been accepted, traffic in VPC 1 won't know ho
       -   The **Destination** is the CIDR block `10.1.0.0/16`
       -   Save our changes!
  
-![image alt](Networking-135)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-135.png)
 
 -   Revisit the **EC2 Instance Connect** tab that's connected to NextWork Public Server.
 -   Woah! Lots of new lines coming through in the terminal.
 
-![image alt](Networking-136)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-136.png)
 
 Congratulations!!! We've successfully resolved the connectivity issue by setting up a peering architecture between VPC 1 and VPC 2!
 
@@ -1777,7 +1777,7 @@ Let's check out what VPC Flow Logs has recorded about our network's activity!
 -   Click into **NextWorkVPCFlowLogsGroup**.
 -   Click into our log stream to see flow logs from EC2 Instance 1!
 
-![image alt](Networking-137)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-137.png)
 
 Log streams in CloudWatch are often named after the network interface ID (`eni-xxx`) when they're associated with VPC flow logs. This helps us organise which streams are tracking traffic to which resources in our VPC.
 
@@ -1785,22 +1785,22 @@ Log streams in CloudWatch are often named after the network interface ID (`eni-x
 
 -   Oooo check out these **log events!**
 
-![image alt](Networking-138)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-138.png)
 
 -   Scroll to the very top and try expanding a log at the top - woahhh, welcome to this flow log.
 
-![image alt](Networking-139)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-139.png)
 
 This flow log shows that **344 bytes** of data were sent successfully from the IP address **18.237.140.165** to **10.1.5.112** using TCP protocol on **port 22**, with **4 packets** transferred and the traffic was allowed (**"ACCEPT"**). EC2 Instance Connect's IP address range in the Oregon region is 18.237.140.160/29, which means the source of traffic mentioned in this log is actually EC2 Instance Connect's direct access to Instance 1!
 
 -   Now scroll to the very bottom and select one of the newer logs, are there any differences?
 -   For example, we might find one that says **REJECT OK** instead of **ACCEPT OK** at the end. These would represent the ping messages that failed to reach Instance 2!
 
-![image alt](Networking-140)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-140.png)
 
 -   In the left hand navigation panel, click on **Logs Insights**.
 
-![image alt](Networking-141)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-141.png)
 
 **Logs Insights** is a CloudWatch feature that analyzes our logs. In Log Insights, we use queries to filter, process and combine data to helps us troubleshoot problems or better understand our network traffic!
 
@@ -1809,27 +1809,27 @@ This flow log shows that **344 bytes** of data were sent successfully from the I
 
 Queries are like commands we run to analyze our logs! We can use queries to filter logs, group data, and perform calculations like sums and averages. We use queries to extract specific information from large volumes of log data, making it easier to see trends, identify outliers, and troubleshoot issues. For example, if we're managing a network and traffic suddenly slows down, we could use queries to extract logs on the longest wait times in our network.
 
-![image alt](Networking-142)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-142.png)
 
 -   Under **Flow Logs**, select **Top 10 byte transfers by source and destination IP addresses**.
 
 The query **"Top 10 byte transfers by source and destination IP addresses"** is all about discovering the top 10 biggest data transfers between IP addresses in our network! We'll find out which resources are moving the most data, which uncovers the busiest traffic routes in our network.
 
-![image alt](Networking-143)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-143.png)
 
 -   Click **Apply**, and then **Run query**.
 
-![image alt](Networking-144)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-144.png)
 
 -   Review the query results... wow!
 
-![image alt](Networking-145)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-145.png)
 
 Out of all the logs that Flow Logs has captured, here are the ten pairs of source and destination IP addresses that transferred the most data between them. So as we might imagine, this is a great query for investigating any heavy traffic flows or unusual data transfers! The bar chart at the top is just a little visualization to show us how many logs were captured at specific times of the day. The table below are the actual results of our query.
 
 -   Can we map the logs with IP addresses we've come across during this project?
 
-![image alt](Networking-146)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-146.png)
 
 **Step - 6 : Delete Our Resources**
 
@@ -1841,7 +1841,7 @@ Keeping track of our resources, and deleting them at the end, is absolutely a sk
 -   Click the **Actions** button, and select **Delete log group(s)**.
 -   Confirm by pressing the **Delete** button.
 
-![image alt](Networking-147)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-147.png)
 
 **Delete our EC2 Instances**
 -   Head back to the **Instances** page of our **EC2** console.
@@ -1857,7 +1857,7 @@ Keeping track of our resources, and deleting them at the end, is absolutely a sk
 -   Select the checkbox to **Delete related route table entries**.
 -   Type `delete` in the text box and click **Delete**.
 
-![image alt](Networking-148)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-148.png)
 
 **Delete our VPCs**
 -   Select **Your VPCs** from our left hand navigation panel.
@@ -1876,7 +1876,7 @@ Keeping track of our resources, and deleting them at the end, is absolutely a sk
 -   Search for `FlowLogs`, and select **NextWorkVPCFlowLogsRole**.
 -   Select **Delete**, then enter `NextWorkVPCFlowLogsRole` to confirm our deletion.
 
-![image alt](Networking-149)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-149.png)
 
 ---
 ##   Access S3 from a VPC
@@ -1934,11 +1934,11 @@ In this step, we're gonna connect to our EC2 instance and try access an AWS serv
 -   In the EC2 Instance Connect set up page, select **Connect** again.
 -   Yay! Successfully connected.
 
-![image alt](Networking-150)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-150.png)
 
 -   For our first command, try running `aws s3 ls`, which is a command used to list the S3 buckets in our account (yup, **ls** stands for list!).
 
-![image alt](Networking-151)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-151.png)
 
 -   Hmmm, doesn't look like a success. We need to provide credentials.
 
@@ -1949,7 +1949,7 @@ When we log into our AWS Management Console, we're already authenticated using o
 -   Run `aws configure`
 -   The terminal is now asking us for an Access Key ID!
 
-![image alt](Networking-152)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-152.png)
 
 An access key ID is a part of a credential! Our credentials are made up of a username and password; think of the access key ID as the username. We don't automatically have one, but we can create access keys IDs through AWS IAM.
 
@@ -1958,29 +1958,29 @@ Our EC2 instance needs credentials to access our AWS services, so let's set up a
 -   Aha! So it's the IAM console that helps us set this up. Select **IAM**.
 -   Search for `Access keys` again in the IAM console's left hand navigation panel.
 
-![image alt](Networking-153)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-153.png)
 
 -   Choose the search result for managing an access key for our IAM Admin account.
 
-![image alt](Networking-154)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-154.png)
 
 -   Select **Create access key**.
 -   On the first set up page, select **Command Line Interface (CLI)**.
 -   Select the checkbox that says **I understand the above recommendation and want to proceed to create an access key.**
 
-![image alt](Networking-155)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-155.png)
 
 In this project we're creating access keys and manually applying them in our EC2 instance, but typically the recommended way is to create an IAM role with the necessary permissions and then attaching that role to our EC2 instance. Our EC2 instance would inherit the permissions from the role, and this is best practice as we can easily attach and detach EC2 instances from roles to give and take away their credentials. We aren't using this method so that we can learn about access keys, but roles are usually a better alternative for security.
 
 -   Select **Next**.
 -   For the **Description tag value**, we'll write `Access key created to access an S3 bucket from an EC2 Instance. NextWork VPC project.`
 
-![image alt](Networking-156)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-156.png)
 
 -   Select **Create access key**.
 -   OOoo this is important! **STAY ON THIS PAGE**
 
-![image alt](Networking-157)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-157.png)
 
 This is the only time that our secret access key can be viewed or downloaded. We cannot recover it later. However, we can create a new access key any time.
 
@@ -2002,7 +2002,7 @@ Next, let's upload two files into the bucket. This can be any two files in our l
 -   Click into our bucket.
 -   Select **Upload**.
 
-![image alt](Networking-159)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-159.png)
 
 -   Select **Add files** in the **Files and folders panel**.
 -   Select two files in our local computer to upload.
@@ -2013,7 +2013,7 @@ Not sure what to upload? You can download and use these images instead! **Right 
 
 Our files should show up in our **Files and folders** panel once they're uploaded!
 
-![image alt](Networking-160)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-160.png)
 
 -   Select **Upload** at the bottom of the page.
 
@@ -2025,7 +2025,7 @@ Our files should show up in our **Files and folders** panel once they're uploade
 -   Copy the **Access key ID**.
 -   Paste this into our EC2 instance's terminal, and press **Enter** on our keyboard.
 
-![image alt](Networking-161)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-161.png)
 
 -   Let's do the same for the **AWS Secret Access Key!**
 -   Copy the key from our .csv file, and paste it in the terminal. Press **Enter**.
@@ -2034,20 +2034,20 @@ Our files should show up in our **Files and folders** panel once they're uploade
 -   Paste that in our EC2 instance's terminal. Press **Enter** on our keyboard.
 -   We don't have a default output format, so we can leave that empty. Press **Enter**.
 
-![image alt](Networking-162)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-162.png)
 
 -   Nice! Set up is done.
 -   Let's try running the `aws s3 ls` command again to see a list of our account's S3 buckets.
 
 Do we see a list of our buckets? We might have a shorter list than the one in this screenshot, but the only line to look out for is **vpc-project-yourname**.
 
-![image alt](Networking-163)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-163.png)
 
 -   Next, let's run the command `aws s3 ls s3://nextwork-vpc-project-yourname`. Make sure to replace `nextwork-vpc-project-yourname` with our actual bucket name.
 -   Based on the command, and what we've learnt about **aws s3 ls**, can we guess what this command does?
 -   Nice - we can even see the objects that are inside our bucket!
 
-![image alt](Networking-164)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-164.png)
 
 We can also upload files using AWS CLI too?!
 -   Run `sudo touch /tmp/test.txt` to create a blank .txt file in your EC2 instance.
@@ -2067,7 +2067,7 @@ Let's break it down!
 
 -   Finally, run `aws s3 ls s3://nextwork-vpc-project-yourname` again - what objects are listed in our bucket now?
 
-![image alt](Networking-165)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-165.png)
 
 The numbers next to each file name is the size of that file! Since test.txt is an empty file with no data, it has 0 bytes.
 
@@ -2075,7 +2075,7 @@ The numbers next to each file name is the size of that file! Since test.txt is a
 -   Refresh the **Objects** tab for our S3 bucket.
 -   Do we see our new file there?
 
-![image alt](Networking-166)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-166.png)
 
 A file we've created in our EC2 instance now lives in our S3 bucket too!
 
@@ -2094,7 +2094,7 @@ Our EC2 instance definitely has access to our bucket - our access key worked But
 -   In a new tab, head back to your **VPC** console.
 -   Select **Endpoints** from the left hand navigation panel.
 
-![image alt](Networking-167)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-167.png)
 
 -   Select **Create endpoint**.
 
@@ -2105,16 +2105,16 @@ That's why VPC endpoints exist to create a private connection between our VPC an
 -   For the **Name tag**, let's use `NextWork VPC Endpoint`.
 -   Keep the **Service category** as **AWS services**.
 
-![image alt](Networking-168)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-168.png)
 
 -   In the **Services** panel, search for `S3`.
 -   Select the filter result that just ends with **s3**.
 
-![image alt](Networking-169)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-169.png)
 
 -   Select the row with the **Type** set to **Gateway**.
 
-![image alt](Networking-170)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-170.png)
 
 A **Gateway** is a type of endpoint used specifically for Amazon S3 and DynamoDB (DynamoDB is an AWS database service). Gateways work by simply adding a route to our VPC route table that directs traffic bound for S3 or DynamoDB to head straight for the Gateway instead of the internet.
 
@@ -2123,11 +2123,11 @@ As AWS evolved and more companies started using it for diverse and complex tasks
 -   Next, at the **VPC** panel, select **NextWork-vpc**.
 -   We'll leave the remaining default values and select **Create endpoint**.
 
-![image alt](Networking-171)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-171.png)
 
 -   Select the checkbox next to our endpoint's name.
 
-![image alt](Networking-172)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-172.png)
 
 **Step - 2 : Create a super secure bucket policy**
 
@@ -2138,7 +2138,7 @@ In our S3 bucket, we're going to kick things up a notch and make access super se
 -   Click into our bucket **vpc-endpoints-yourname**.
 -   Select the **Permissions** tab.
 
-![image alt](Networking-173)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-173.png)
 
 -   Scroll to the **Bucket policy** panel, and select **Edit**.
 
@@ -2174,12 +2174,12 @@ Don't forget to replace:
 1.   BOTH instances of **arn:aws:s3:::your-bucket-name** with our actual bucket ARN.
       -   Handy tip: we can find our Bucket ARN right above the Policy window
   
-![image alt](Networking-174)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-174.png)
 
 1.   **vpce-xxxxxxx** with our VPC endpoint's ID.
       -   To find this ID, we'll have to switch back to our **Endpoints** tab and copy our endpoint's ID. Make sure it starts with `vpce-`.
   
-![image alt](Networking-175)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-175.png)
 
 After replacing the default values with our resources' ARN or ID, double check that we haven't deleted the quote marks around any of our statements. Also check that we still have `/*` at the second Resource line!
 
@@ -2187,7 +2187,7 @@ After replacing the default values with our resources' ARN or ID, double check t
 
 Woah! Once we've saved our changes, panels have turned red all across the screen.
 
-![image alt](Networking-176)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-176.png)
 
 Our policy denies all actions unless they come from our VPC endpoint. This means any attempt to access our bucket from other sources, including the AWS Management Console, is blocked!
 
@@ -2203,7 +2203,7 @@ If it can't, something's gone wrong with our VPC endpoint set up...
 -   Try running `aws s3 ls s3://nextwork-vpc-endpoints-yourname` again.
 -   Ah! Access denied. It looks like the bucket policy had stopped us.
 
-![image alt](Networking-177)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-177.png)
 
 -   Troubleshoot this error by heading to our VPC console.
 -   Select **Subnets** from the left hand navigation panel.
@@ -2211,7 +2211,7 @@ If it can't, something's gone wrong with our VPC endpoint set up...
 -   Select the **Route table** tab.
 -   Aha! Mystery solved.
 
-![image alt](Networking-178)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-178.png)
 
 If our route table doesn't have a route that directs traffic bound for S3 to our VPC endpoint, traffic from our EC2 instance is actually trying to get to our S3 bucket through the public internet instead.
 
@@ -2220,18 +2220,18 @@ If our route table doesn't have a route that directs traffic bound for S3 to our
 -   Select the checkbox next to our endpoint, and select **Route tables**.
 -   Select **Manage route tables**.
 
-![image alt](Networking-179)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-179.png)
 
 -   Select the checkbox next to our public route table.
 -   Select **Modify route tables**.
 
-![image alt](Networking-180)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-180.png)
 
 -   Head back to the **Subnets** page.
 -   Select the refresh button next to the **Actions** dropdown.
 -   Check the **Route table** tab for our public subnet again.
 
-![image alt](Networking-181)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-181.png)
 
 Nice! there's a route to the VPC endpoint now.
 
@@ -2240,7 +2240,7 @@ To validate our work, let's get our EC2 instance to interact with our S3 bucket 
 -   Back in our **EC2 Instance Connect** tab, run `aws s3 ls s3://nextwork-vpc-endpoints-yourname` again.
 -   WOOOHOOOO! We're back.
 
-![image alt](Networking-182)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-182.png)
 
 -   Congrats on making a successful VPC endpoint connection!
 
@@ -2252,14 +2252,14 @@ To validate our work, let's get our EC2 instance to interact with our S3 bucket 
 -   Select **Edit policy**.
 -   Change the line **"Effect": "Allow"** to `"Effect": "Deny"`!
 
-![image alt](Networking-183)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-183.png)
 
 -   Click **Save**.
 -   Switch back to our EC2 Instance Connect tab.
 -   Run `aws s3 ls s3://nextwork-vpc-endpoints-yourname` - what do we see now?
 -   Wow! The endpoint policy now stops us from accessing our S3 bucket.
 
-![image alt](Networking-184)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-184.png)
 
 This is a great tool to quickly block off access if we suspect attackers are using our endpoint to access our resources! Instantly switch the effect to Deny, and our Gateway is closed. We could also use VPC endpoint policies to be even more granular with the way we give away access to our AWS services. For example, we can write a policy that gives our endpoint read access only to S3 buckets, so the permission to upload objects is denied.
 
@@ -2268,7 +2268,7 @@ This is a great tool to quickly block off access if we suspect attackers are usi
 -   Change the policy back to `"Effect": "Allow"` - this will be important when it comes to deleting our resources later!
 -   Select **Save changes**.
 
-![image alt](Networking-185)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-185.png)
 
 **Step - 4 : Delete Our Resources**
 
@@ -2281,7 +2281,7 @@ Keeping track of our resources, and deleting them at the end, is absolutely a sk
 -   Enter our bucket name, and select **Delete bucket**.
 -   Oh no!
 
-![image alt](Networking-186)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-186.png)
 
 -   Deleting our bucket from the console is not possible - don't forget, our S3 bucket policy literally denies everyone else (**except** traffic from the VPC endpoint) access to the bucket.
 -   Our only option is to delete our bucket through the EC2 instance!
@@ -2290,23 +2290,23 @@ Keeping track of our resources, and deleting them at the end, is absolutely a sk
 
 `rb` is a command that deletes our bucket! This means `rb s3://nextwork-vpc-endpoints-yourname` is used to delete our S3 bucket nextwork-vpc-endpoints-yourname.
 
-![image alt](Networking-187)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-187.png)
 
 -   Nope! The delete failed - we need to make sure our bucket is empty first.
 -   To delete everything in our bucket, run the command `aws s3 rm s3://nextwork-vpc-endpoints-yourname --recursive`
 
 `rm` stands for "remove" and is used to remove things inside our bucket. `--recursive` means the remove command should include all objects and subdirectories inside our bucket. This is a super helpful command to run before delete a non-empty bucket.
 
-![image alt](Networking-188)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-188.png)
 
 -   Run the command `aws s3 rb s3://nextwork-vpc-endpoints-yourname` again.
 
-![image alt](Networking-189)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-189.png)
 
 -   That's our S3 bucket successfully removed.
 -   Let's check it's gone by running `aws s3 ls` one last time - does our bucket still show in the list of results?
 
-![image alt](Networking-190)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-190.png)
 
 **Delete our EC2 Instance**
 -   Head back to the **Instances** page of our EC2 console.
@@ -2338,4 +2338,4 @@ At the popup panel, select **Deactivate**, and enter our **access key ID** into 
 Select **Delete**.
 Last but definitely not least - don't forget to delete the local access key **.csv file** saved on our local computer!
 
-![image alt](Networking-191)
+![image alt](https://github.com/AtulSharmaGeit/AWS-X-Networking/blob/a500aa8eb69793bd86547939ba09156fb62c0c88/Images/Networking-191.png)
